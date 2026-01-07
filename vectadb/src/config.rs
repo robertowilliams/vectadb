@@ -72,7 +72,7 @@ impl Config {
             database: DatabaseConfig {
                 surrealdb: SurrealDBConfig {
                     endpoint: env::var("SURREAL_ENDPOINT")
-                        .unwrap_or_else(|_| "ws://localhost:8000".to_string()),
+                        .unwrap_or_else(|_| "localhost:8000".to_string()),
                     namespace: env::var("SURREAL_NAMESPACE")
                         .unwrap_or_else(|_| "vectadb".to_string()),
                     database: env::var("SURREAL_DATABASE")

@@ -2,7 +2,7 @@
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
-use surrealdb::engine::remote::ws::{Client, Ws};
+use surrealdb::engine::remote::http::{Client, Http};
 use surrealdb::opt::auth::Root;
 use surrealdb::Surreal;
 use std::sync::Arc;
@@ -32,25 +32,40 @@ impl SurrealDBClient {
     /// Create a new SurrealDB client and connect
     pub async fn new(config: &DatabaseConfig) -> Result<Self> {
         info!("Connecting to SurrealDB at {}", config.surrealdb.endpoint);
+        debug!("Connection details - namespace: {}, database: {}",
+               config.surrealdb.namespace, config.surrealdb.database);
 
         // Connect to SurrealDB
-        let db = Surreal::new::<Ws>(&config.surrealdb.endpoint)
-            .await
-            .context("Failed to connect to SurrealDB")?;
+        debug!("Step 1: Establishing HTTP connection...");
+        let db = match Surreal::new::<Http>(&config.surrealdb.endpoint).await {
+            Ok(client) => {
+                debug!("Step 1: HTTP connection established successfully");
+                client
+            }
+            Err(e) => {
+                warn!("Step 1 failed with error: {:?}", e);
+                return Err(anyhow::anyhow!("Failed to establish HTTP connection to SurrealDB: {}", e));
+            }
+        };
 
         // Authenticate
+        debug!("Step 2: Authenticating as root user...");
         db.signin(Root {
             username: &config.surrealdb.username,
             password: &config.surrealdb.password,
         })
         .await
         .context("Failed to authenticate with SurrealDB")?;
+        debug!("Step 2: Authentication successful");
 
         // Use namespace and database
+        debug!("Step 3: Selecting namespace '{}' and database '{}'...",
+               config.surrealdb.namespace, config.surrealdb.database);
         db.use_ns(&config.surrealdb.namespace)
             .use_db(&config.surrealdb.database)
             .await
             .context("Failed to select namespace/database")?;
+        debug!("Step 3: Namespace and database selected successfully");
 
         info!(
             "Connected to SurrealDB: {}/{}",

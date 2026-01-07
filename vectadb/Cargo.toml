@@ -14,7 +14,7 @@ tower = "0.4"
 tower-http = { version = "0.5", features = ["cors", "trace", "fs"] }
 
 # Database clients
-surrealdb = "2.0"
+surrealdb = { version = "2.1", features = ["protocol-http"] }
 qdrant-client = "1.10"
 
 # Serialization

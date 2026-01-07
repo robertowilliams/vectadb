@@ -8,9 +8,14 @@ mod embeddings;
 mod ontology;
 mod intelligence;
 mod api;
+mod db;
+mod query;
 
 use config::Config;
 use error::Result;
+use std::sync::Arc;
+use tokio::sync::RwLock;
+use tracing::warn;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -41,14 +46,86 @@ async fn main() -> Result<()> {
     let config = Config::from_env()?;
     tracing::info!("Configuration loaded successfully");
     tracing::info!("Server will listen on {}:{}", config.server.host, config.server.port);
-    tracing::info!("SurrealDB: {}", config.surrealdb.url);
-    tracing::info!("Qdrant: {}", config.qdrant.url);
+    tracing::info!("SurrealDB: {}", config.database.surrealdb.endpoint);
+    tracing::info!("Qdrant: {}", config.database.qdrant.url);
 
-    // TODO: Initialize database connections
-    // TODO: Initialize embedding service
+    // Initialize database connections
+    tracing::info!("Connecting to SurrealDB...");
+    let surreal = match db::SurrealDBClient::new(&config.database).await {
+        Ok(client) => {
+            tracing::info!("SurrealDB connected successfully");
+            Some(Arc::new(client))
+        }
+        Err(e) => {
+            warn!("Failed to connect to SurrealDB: {}. Continuing without database support.", e);
+            None
+        }
+    };
 
-    // Create API router
-    let app = api::create_router();
+    tracing::info!("Connecting to Qdrant...");
+    let qdrant = match db::QdrantClient::new(&config.database.qdrant).await {
+        Ok(client) => {
+            tracing::info!("Qdrant connected successfully");
+            Some(Arc::new(client))
+        }
+        Err(e) => {
+            warn!("Failed to connect to Qdrant: {}. Continuing without vector search.", e);
+            None
+        }
+    };
+
+    // Initialize embedding service
+    tracing::info!("Loading embedding model...");
+    let embedding_service = match embeddings::EmbeddingService::new(
+        embeddings::service::EmbeddingModel::BgeSmallEnV1_5,
+        Some(32)
+    ) {
+        Ok(service) => {
+            tracing::info!("Embedding service initialized successfully");
+            Some(Arc::new(service))
+        }
+        Err(e) => {
+            warn!("Failed to initialize embedding service: {}. Vector features disabled.", e);
+            None
+        }
+    };
+
+    // Load ontology schema from database if available
+    let reasoner = Arc::new(RwLock::new(None));
+    if let Some(ref surreal_client) = surreal {
+        match surreal_client.get_schema().await {
+            Ok(Some(schema)) => {
+                tracing::info!("Loaded ontology schema from database");
+                let mut reasoner_guard = reasoner.write().await;
+                let r = intelligence::OntologyReasoner::new(schema);
+                tracing::info!("Ontology reasoner initialized with persisted schema");
+                *reasoner_guard = Some(r);
+            }
+            Ok(None) => {
+                tracing::info!("No ontology schema found in database");
+            }
+            Err(e) => {
+                warn!("Failed to load schema from database: {}", e);
+            }
+        }
+    }
+
+    // Create API router with database support
+    let app = if surreal.is_some() && qdrant.is_some() && embedding_service.is_some() {
+        tracing::info!("Creating API router with full database support");
+        let state = api::handlers::AppState::with_databases(
+            reasoner.clone(),
+            surreal.unwrap(),
+            qdrant.unwrap(),
+            embedding_service.unwrap(),
+        );
+        api::routes::create_router_with_state(state)
+    } else {
+        tracing::info!("Creating API router without database support (ontology-only mode)");
+        let mut state = api::handlers::AppState::new();
+        state.reasoner = reasoner;
+        api::routes::create_router_with_state(state)
+    };
 
     // Start HTTP server
     let addr = format!("{}:{}", config.server.host, config.server.port);

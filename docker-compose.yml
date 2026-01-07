@@ -3,11 +3,12 @@ version: '3.8'
 services:
   # SurrealDB - Documents + Graphs
   surrealdb:
-    image: surrealdb/surrealdb:latest
+    image: surrealdb/surrealdb:v2.3.10
     container_name: vectadb-surrealdb
+    user: "0:0"
     ports:
       - "8000:8000"
-    command: start --log info --user root --pass root memory
+    command: start --log info --user root --pass root --bind 0.0.0.0:8000 file:///data/vectadb.db
     volumes:
       - surrealdb_data:/data
     networks:
