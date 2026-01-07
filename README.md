@@ -79,6 +79,15 @@ cargo run --release
 
 VectaDB API will be available at `http://localhost:8080`
 
+## Documentation
+
+Comprehensive documentation is available in the `vectadb/docs/` directory:
+
+- **[API Documentation](./vectadb/docs/API.md)** - Complete REST API reference with examples
+- **[Testing Guide](./vectadb/docs/TESTING.md)** - How to run and write tests
+- **[Deployment Guide](./vectadb/docs/DEPLOYMENT.md)** - Production deployment instructions
+- **[Development Guide](./vectadb/docs/DEVELOPMENT.md)** - Contributing and development workflow
+
 ## API Endpoints
 
 ### Agents
@@ -281,13 +290,23 @@ agent = Agent(
 ## Roadmap
 
 - [x] Phase 1: Foundation (data models, config)
-- [ ] Phase 2: Database integration (SurrealDB + Qdrant)
-- [ ] Phase 3: VectaDB router layer
-- [ ] Phase 4: REST API with Axum
-- [ ] Phase 5: Testing & documentation
+- [x] Phase 2: Database integration (SurrealDB + Qdrant)
+- [x] Phase 3: VectaDB router layer
+- [x] Phase 4: REST API with Axum
+- [x] Phase 5: Testing & documentation
 - [ ] Phase 6: Python SDK
 - [ ] Phase 7: Dashboard UI
 - [ ] Phase 8: Advanced analytics
+
+### Phase 5 Complete! (January 7, 2026)
+
+- ✅ 75 passing tests (64 unit + 11 integration)
+- ✅ Comprehensive API documentation
+- ✅ Testing guide with examples
+- ✅ Deployment guide for production
+- ✅ Development guide for contributors
+- ✅ Zero deprecation warnings
+- ✅ All code quality checks passing
 
 ## Contributing
 
