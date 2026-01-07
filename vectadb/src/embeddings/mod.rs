@@ -10,8 +10,4 @@ pub use service::{EmbeddingService, EmbeddingModel};
 
 pub use manager::EmbeddingManager;
 
-pub use plugin::{
-    EmbeddingPlugin, PluginConfig, PluginHealth, PluginRegistry, PluginStats, ProviderConfig,
-};
 
-pub use plugins::{CoherePlugin, HuggingFacePlugin, OpenAIPlugin, VoyagePlugin};

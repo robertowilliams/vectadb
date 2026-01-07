@@ -1,7 +1,6 @@
 // Ontology schema management
 
 use serde::{Deserialize, Serialize};
-use serde_json::Value as JsonValue;
 use std::collections::HashMap;
 
 use super::entity_type::EntityType;

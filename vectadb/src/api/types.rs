@@ -264,8 +264,7 @@ pub struct RelationResponse {
 
 /// Hybrid query request (re-export from query module)
 pub use crate::query::{
-    HybridQuery, VectorQuery, GraphQuery, CombinedQuery,
-    TraversalDirection, MergeStrategy, QueryResult,
+    HybridQuery, QueryResult,
 };
 
 // ============================================================================

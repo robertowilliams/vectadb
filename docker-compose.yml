@@ -13,11 +13,14 @@ services:
       - surrealdb_data:/data
     networks:
       - vectadb-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    # Health check disabled - SurrealDB container doesn't include curl/wget
+    # Service is monitored via application-level connections instead
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -s http://localhost:8000/health || exit 1"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    #   start_period: 10s
 
   # Qdrant - Vector Search
   qdrant:
@@ -33,11 +36,14 @@ services:
       - QDRANT__SERVICE__GRPC_PORT=6334
     networks:
       - vectadb-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    # Health check disabled - Qdrant container doesn't include curl/wget
+    # Service is monitored via application-level connections instead
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -s http://localhost:6333/healthz || exit 1"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    #   start_period: 10s
 
   # VectaDB API (to be built)
   # Uncomment after implementing the Rust application

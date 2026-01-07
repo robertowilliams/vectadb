@@ -1,7 +1,7 @@
 // Qdrant client for vector similarity search
 
 use anyhow::{Context, Result};
-use qdrant_client::prelude::*;
+use qdrant_client::Qdrant;
 use qdrant_client::qdrant::{
     vectors_config::Config, CreateCollection, Distance, PointStruct, SearchPoints,
     VectorParams, VectorsConfig,
@@ -10,11 +10,10 @@ use std::collections::HashMap;
 use tracing::{debug, info, warn};
 
 use crate::config::QdrantConfig;
-use super::types::{Entity, ScoredEntity};
 
 /// Qdrant client wrapper for vector operations
 pub struct QdrantClient {
-    client: qdrant_client::client::QdrantClient,
+    client: Qdrant,
     collection_prefix: String,
 }
 
@@ -23,14 +22,15 @@ impl QdrantClient {
     pub async fn new(config: &QdrantConfig) -> Result<Self> {
         info!("Connecting to Qdrant at {}", config.url);
 
-        let mut client_config = QdrantClientConfig::from_url(&config.url);
+        // Build client using the new API
+        let mut builder = Qdrant::from_url(&config.url);
 
         // Add API key if provided
         if let Some(api_key) = &config.api_key {
-            client_config.set_api_key(api_key);
+            builder = builder.api_key(api_key.clone());
         }
 
-        let client = qdrant_client::client::QdrantClient::new(Some(client_config))
+        let client = builder.build()
             .context("Failed to create Qdrant client")?;
 
         info!("Connected to Qdrant");
@@ -96,7 +96,7 @@ impl QdrantClient {
         };
 
         self.client
-            .create_collection(&create_collection)
+            .create_collection(create_collection)
             .await
             .context(format!("Failed to create collection {}", collection_name))?;
 
@@ -110,7 +110,7 @@ impl QdrantClient {
         debug!("Deleting Qdrant collection: {}", collection_name);
 
         self.client
-            .delete_collection(&collection_name)
+            .delete_collection(collection_name.clone())
             .await
             .context(format!("Failed to delete collection {}", collection_name))?;
 
@@ -122,7 +122,7 @@ impl QdrantClient {
     pub async fn collection_exists(&self, entity_type: &str) -> Result<bool> {
         let collection_name = self.collection_name(entity_type);
         self.client
-            .collection_exists(&collection_name)
+            .collection_exists(collection_name)
             .await
             .context("Failed to check collection existence")
     }
@@ -164,8 +164,16 @@ impl QdrantClient {
             payload,
         );
 
+        use qdrant_client::qdrant::UpsertPoints;
+
+        let upsert_request = UpsertPoints {
+            collection_name: collection_name.clone(),
+            points: vec![point],
+            ..Default::default()
+        };
+
         self.client
-            .upsert_points(&collection_name, None, vec![point], None)
+            .upsert_points(upsert_request)
             .await
             .context("Failed to upsert embedding")?;
 
@@ -178,7 +186,7 @@ impl QdrantClient {
         let collection_name = self.collection_name(entity_type);
         debug!("Deleting embedding for entity {} from {}", entity_id, collection_name);
 
-        use qdrant_client::qdrant::{PointsSelector, PointsIdsList};
+        use qdrant_client::qdrant::{PointsSelector, PointsIdsList, DeletePoints};
 
         let points_selector = PointsSelector {
             points_selector_one_of: Some(
@@ -190,8 +198,14 @@ impl QdrantClient {
             ),
         };
 
+        let delete_request = DeletePoints {
+            collection_name: collection_name.clone(),
+            points: Some(points_selector),
+            ..Default::default()
+        };
+
         self.client
-            .delete_points(&collection_name, None, &points_selector, None)
+            .delete_points(delete_request)
             .await
             .context("Failed to delete embedding")?;
 
@@ -229,7 +243,7 @@ impl QdrantClient {
 
         let search_result = self
             .client
-            .search_points(&search_points)
+            .search_points(search_points)
             .await
             .context("Failed to search vectors")?;
 
@@ -279,7 +293,7 @@ impl QdrantClient {
 
         let search_result = self
             .client
-            .search_points(&search_points)
+            .search_points(search_points)
             .await
             .context("Failed to search vectors")?;
 

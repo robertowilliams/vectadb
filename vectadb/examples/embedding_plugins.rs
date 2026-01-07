@@ -176,7 +176,8 @@ async fn load_and_test_plugin<P: EmbeddingPlugin + Default>(
     let has_real_key = match &config.provider {
         vectadb::embeddings::ProviderConfig::OpenAI { api_key, .. }
         | vectadb::embeddings::ProviderConfig::Cohere { api_key, .. }
-        | vectadb::embeddings::ProviderConfig::HuggingFace { api_key, .. } => {
+        | vectadb::embeddings::ProviderConfig::HuggingFace { api_key, .. }
+        | vectadb::embeddings::ProviderConfig::Voyage { api_key, .. } => {
             !api_key.starts_with("${") && !api_key.is_empty()
         }
         vectadb::embeddings::ProviderConfig::Local { .. } => true,
