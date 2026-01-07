@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # SurrealDB - Documents + Graphs
+  surrealdb:
+    image: surrealdb/surrealdb:latest
+    container_name: vectadb-surrealdb
+    ports:
+      - "8000:8000"
+    command: start --log info --user root --pass root memory
+    volumes:
+      - surrealdb_data:/data
+    networks:
+      - vectadb-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Qdrant - Vector Search
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: vectadb-qdrant
+    ports:
+      - "6333:6333"  # HTTP API
+      - "6334:6334"  # gRPC API
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__HTTP_PORT=6333
+      - QDRANT__SERVICE__GRPC_PORT=6334
+    networks:
+      - vectadb-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # VectaDB API (to be built)
+  # Uncomment after implementing the Rust application
+  # vectadb:
+  #   build: ./vectadb
+  #   container_name: vectadb-api
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     - SURREAL_URL=ws://surrealdb:8000
+  #     - SURREAL_USER=root
+  #     - SURREAL_PASS=root
+  #     - SURREAL_NAMESPACE=vectadb
+  #     - SURREAL_DATABASE=production
+  #     - QDRANT_URL=http://qdrant:6333
+  #     - QDRANT_AGENT_COLLECTION=agents
+  #     - QDRANT_TASK_COLLECTION=tasks
+  #     - RUST_LOG=info,vectadb=debug
+  #     - API_KEY=dev-key-change-in-production
+  #   depends_on:
+  #     surrealdb:
+  #       condition: service_healthy
+  #     qdrant:
+  #       condition: service_healthy
+  #   networks:
+  #     - vectadb-network
+
+volumes:
+  surrealdb_data:
+    driver: local
+  qdrant_data:
+    driver: local
+
+networks:
+  vectadb-network:
+    driver: bridge

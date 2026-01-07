@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Rust
+vectadb/target/
+**/*.rs.bk
+*.pdb
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+
+# Documentation builds
+docs/_build/
