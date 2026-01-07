@@ -1,0 +1,1754 @@
+[
+  {
+    "timestamp": "2025-12-17T01:09:56Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "8d8903c3-e948-4c21-b4d9-6029f785f196",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "input": {
+      "inputContentType": "application/json",
+      "inputBodyJson": {
+        "messages": [
+          {
+            "role": "user",
+            "content": [
+              {
+                "text": "What immunizations does patient PAT001 need?"
+              }
+            ]
+          }
+        ],
+        "system": [
+          {
+            "text": "You are a helpful healthcare virtual assistant that helps the user with booking appointment for a immunization for a child.\nUse the tools/functions available to you to help the user.\n\nFollow these strict rules:\n1. Use patient_id=PAT001 for patient operations\n2. Only use Immunization EMR for patient_id=PAT001 for searching and booking\n\nDo not make up any information. Ask for clarification if needed.\n\nAlways format your responses in a clear, friendly manner with proper spacing and structure.\n"
+          }
+        ],
+        "inferenceConfig": {
+          "temperature": 0.7
+        },
+        "toolConfig": {
+          "tools": [
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___bookAppointment",
+                "description": "Book appointment for the given datetime slot",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "date_string": {
+                        "examples": [
+                          "2025-01-15 10:00"
+                        ],
+                        "type": "string",
+                        "description": "Preferred date and time in YYYY-MM-DD HH:MM format"
+                      }
+                    },
+                    "required": [
+                      "date_string"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___getPatient",
+                "description": "Returns patient details based on patient id from mock data",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "patient_id": {
+                        "examples": [
+                          "patient-001"
+                        ],
+                        "type": "string",
+                        "description": "ID of the patient to return (e.g., patient-001, patient-002, patient-003)"
+                      }
+                    },
+                    "required": [
+                      "patient_id"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___getSlots",
+                "description": "Returns doctor details along with available datetime slots near the requested date",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "date_string": {
+                        "examples": [
+                          "2025-01-15"
+                        ],
+                        "type": "string",
+                        "description": "Preferred date in YYYY-MM-DD format"
+                      }
+                    },
+                    "required": [
+                      "date_string"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___searchImmunization",
+                "description": "Search immunization records based on Patient ID",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "search_value": {
+                        "examples": [
+                          "patient-001"
+                        ],
+                        "type": "string",
+                        "description": "Patient ID to search for immunization records"
+                      }
+                    },
+                    "required": [
+                      "search_value"
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "toolChoice": {
+            "auto": {}
+          }
+        }
+      },
+      "inputTokenCount": 1023,
+      "cacheReadInputTokenCount": 0,
+      "cacheWriteInputTokenCount": 0
+    },
+    "output": {
+      "outputContentType": "application/json",
+      "outputBodyJson": {
+        "output": {
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I'll search for the immunization records for patient PAT001 to see what immunizations they need."
+              },
+              {
+                "toolUse": {
+                  "toolUseId": "tooluse_50nrLqI5R2ChSyM6RY4NFw",
+                  "name": "LocalFHIRAPI___searchImmunization",
+                  "type": "tool_use",
+                  "input": {
+                    "search_value": "PAT001"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "stopReason": "tool_use",
+        "metrics": {
+          "latencyMs": 858
+        },
+        "usage": {
+          "inputTokens": 1023,
+          "outputTokens": 89,
+          "totalTokens": 1112
+        }
+      },
+      "outputTokenCount": 89
+    },
+    "inferenceRegion": "us-east-2",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:09:57Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "f6149ce9-5e36-4229-8b23-df5a963deea3",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "input": {
+      "inputContentType": "application/json",
+      "inputBodyJson": {
+        "messages": [
+          {
+            "role": "user",
+            "content": [
+              {
+                "text": "What immunizations does patient PAT001 need?"
+              }
+            ]
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I'll search for the immunization records for patient PAT001 to see what immunizations they need."
+              },
+              {
+                "toolUse": {
+                  "toolUseId": "tooluse_50nrLqI5R2ChSyM6RY4NFw",
+                  "name": "LocalFHIRAPI___searchImmunization",
+                  "input": {
+                    "search_value": "PAT001"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "toolResult": {
+                  "toolUseId": "tooluse_50nrLqI5R2ChSyM6RY4NFw",
+                  "content": [
+                    {
+                      "text": "An internal error occurred. Please retry later."
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "system": [
+          {
+            "text": "You are a helpful healthcare virtual assistant that helps the user with booking appointment for a immunization for a child.\nUse the tools/functions available to you to help the user.\n\nFollow these strict rules:\n1. Use patient_id=PAT001 for patient operations\n2. Only use Immunization EMR for patient_id=PAT001 for searching and booking\n\nDo not make up any information. Ask for clarification if needed.\n\nAlways format your responses in a clear, friendly manner with proper spacing and structure.\n"
+          }
+        ],
+        "inferenceConfig": {
+          "temperature": 0.7
+        },
+        "toolConfig": {
+          "tools": [
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___bookAppointment",
+                "description": "Book appointment for the given datetime slot",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "date_string": {
+                        "examples": [
+                          "2025-01-15 10:00"
+                        ],
+                        "type": "string",
+                        "description": "Preferred date and time in YYYY-MM-DD HH:MM format"
+                      }
+                    },
+                    "required": [
+                      "date_string"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___getPatient",
+                "description": "Returns patient details based on patient id from mock data",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "patient_id": {
+                        "examples": [
+                          "patient-001"
+                        ],
+                        "type": "string",
+                        "description": "ID of the patient to return (e.g., patient-001, patient-002, patient-003)"
+                      }
+                    },
+                    "required": [
+                      "patient_id"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___getSlots",
+                "description": "Returns doctor details along with available datetime slots near the requested date",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "date_string": {
+                        "examples": [
+                          "2025-01-15"
+                        ],
+                        "type": "string",
+                        "description": "Preferred date in YYYY-MM-DD format"
+                      }
+                    },
+                    "required": [
+                      "date_string"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___searchImmunization",
+                "description": "Search immunization records based on Patient ID",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "search_value": {
+                        "examples": [
+                          "patient-001"
+                        ],
+                        "type": "string",
+                        "description": "Patient ID to search for immunization records"
+                      }
+                    },
+                    "required": [
+                      "search_value"
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "toolChoice": {
+            "auto": {}
+          }
+        }
+      },
+      "inputTokenCount": 1140,
+      "cacheReadInputTokenCount": 0,
+      "cacheWriteInputTokenCount": 0
+    },
+    "output": {
+      "outputContentType": "application/json",
+      "outputBodyJson": {
+        "output": {
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I apologize, but I encountered an error while trying to retrieve the immunization records for patient PAT001. Let me try getting the patient's basic information first to better assist you."
+              },
+              {
+                "toolUse": {
+                  "toolUseId": "tooluse_V90UuVxOQQ26kb8lUwnfnQ",
+                  "name": "LocalFHIRAPI___getPatient",
+                  "type": "tool_use",
+                  "input": {
+                    "patient_id": "PAT001"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "stopReason": "tool_use",
+        "metrics": {
+          "latencyMs": 1912
+        },
+        "usage": {
+          "inputTokens": 1140,
+          "outputTokens": 103,
+          "totalTokens": 1243
+        }
+      },
+      "outputTokenCount": 103
+    },
+    "inferenceRegion": "eu-north-1",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:00Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "2332a2ff-7fb4-41b1-bd42-d5442a6c49d2",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "input": {
+      "inputContentType": "application/json",
+      "inputBodyJson": {
+        "messages": [
+          {
+            "role": "user",
+            "content": [
+              {
+                "text": "What immunizations does patient PAT001 need?"
+              }
+            ]
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I'll search for the immunization records for patient PAT001 to see what immunizations they need."
+              },
+              {
+                "toolUse": {
+                  "toolUseId": "tooluse_50nrLqI5R2ChSyM6RY4NFw",
+                  "name": "LocalFHIRAPI___searchImmunization",
+                  "input": {
+                    "search_value": "PAT001"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "toolResult": {
+                  "toolUseId": "tooluse_50nrLqI5R2ChSyM6RY4NFw",
+                  "content": [
+                    {
+                      "text": "An internal error occurred. Please retry later."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I apologize, but I encountered an error while trying to retrieve the immunization records for patient PAT001. Let me try getting the patient's basic information first to better assist you."
+              },
+              {
+                "toolUse": {
+                  "toolUseId": "tooluse_V90UuVxOQQ26kb8lUwnfnQ",
+                  "name": "LocalFHIRAPI___getPatient",
+                  "input": {
+                    "patient_id": "PAT001"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "toolResult": {
+                  "toolUseId": "tooluse_V90UuVxOQQ26kb8lUwnfnQ",
+                  "content": [
+                    {
+                      "text": "An internal error occurred. Please retry later."
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "system": [
+          {
+            "text": "You are a helpful healthcare virtual assistant that helps the user with booking appointment for a immunization for a child.\nUse the tools/functions available to you to help the user.\n\nFollow these strict rules:\n1. Use patient_id=PAT001 for patient operations\n2. Only use Immunization EMR for patient_id=PAT001 for searching and booking\n\nDo not make up any information. Ask for clarification if needed.\n\nAlways format your responses in a clear, friendly manner with proper spacing and structure.\n"
+          }
+        ],
+        "inferenceConfig": {
+          "temperature": 0.7
+        },
+        "toolConfig": {
+          "tools": [
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___bookAppointment",
+                "description": "Book appointment for the given datetime slot",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "date_string": {
+                        "examples": [
+                          "2025-01-15 10:00"
+                        ],
+                        "type": "string",
+                        "description": "Preferred date and time in YYYY-MM-DD HH:MM format"
+                      }
+                    },
+                    "required": [
+                      "date_string"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___getPatient",
+                "description": "Returns patient details based on patient id from mock data",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "patient_id": {
+                        "examples": [
+                          "patient-001"
+                        ],
+                        "type": "string",
+                        "description": "ID of the patient to return (e.g., patient-001, patient-002, patient-003)"
+                      }
+                    },
+                    "required": [
+                      "patient_id"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___getSlots",
+                "description": "Returns doctor details along with available datetime slots near the requested date",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "date_string": {
+                        "examples": [
+                          "2025-01-15"
+                        ],
+                        "type": "string",
+                        "description": "Preferred date in YYYY-MM-DD format"
+                      }
+                    },
+                    "required": [
+                      "date_string"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___searchImmunization",
+                "description": "Search immunization records based on Patient ID",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "search_value": {
+                        "examples": [
+                          "patient-001"
+                        ],
+                        "type": "string",
+                        "description": "Patient ID to search for immunization records"
+                      }
+                    },
+                    "required": [
+                      "search_value"
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "toolChoice": {
+            "auto": {}
+          }
+        }
+      },
+      "inputTokenCount": 1271,
+      "cacheReadInputTokenCount": 0,
+      "cacheWriteInputTokenCount": 0
+    },
+    "output": {
+      "outputContentType": "application/json",
+      "outputBodyJson": {
+        "output": {
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I apologize for the technical difficulties. I'm currently unable to access the immunization records and patient information for PAT001 due to system errors. \n\n**What I can help you with:**\n- Once the system is back online, I can retrieve the immunization records for patient PAT001\n- I can help you book an appointment for immunizations on a date of your choosing\n- I can check available appointment slots with doctors\n\n**Could you please:**\n1. Try again in a moment, or\n2. Let me know if you'd like to proceed with booking an immunization appointment for a specific date?\n\nI apologize for the inconvenience!"
+              }
+            ]
+          }
+        },
+        "stopReason": "end_turn",
+        "metrics": {
+          "latencyMs": 2324
+        },
+        "usage": {
+          "inputTokens": 1271,
+          "outputTokens": 142,
+          "totalTokens": 1413
+        }
+      },
+      "outputTokenCount": 142
+    },
+    "inferenceRegion": "us-east-2",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:02Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "78d218c4-1971-42e5-b4f3-da908c8887a1",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:03Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "fc50ac49-e84d-435a-86ca-e2cf1aa66378",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:04Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "4d068fc6-1b93-4cee-b855-d46d57ca0468",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:08Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "909ed72c-5103-4ca5-9fa1-dc6ecee43a62",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:08Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "b1ecdc18-6f00-406a-b86a-47b3d93402e8",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:12Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "e6b2995c-1d7c-4134-a844-420ccf0ce569",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:13Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "0c2e49c5-39c9-4601-8698-317d7b23948b",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:14Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "16d3ef6b-b091-40a9-849d-9f0cc5fc3775",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:17Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "5328cd30-99d3-4df6-8ab0-863d2a800f57",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "input": {
+      "inputContentType": "application/json",
+      "inputBodyJson": {
+        "messages": [
+          {
+            "role": "user",
+            "content": [
+              {
+                "text": "What immunizations does patient PAT001 need?"
+              }
+            ]
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I'll search for the immunization records for patient PAT001 to see what immunizations they need."
+              },
+              {
+                "toolUse": {
+                  "toolUseId": "tooluse_50nrLqI5R2ChSyM6RY4NFw",
+                  "name": "LocalFHIRAPI___searchImmunization",
+                  "input": {
+                    "search_value": "PAT001"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "toolResult": {
+                  "toolUseId": "tooluse_50nrLqI5R2ChSyM6RY4NFw",
+                  "content": [
+                    {
+                      "text": "An internal error occurred. Please retry later."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I apologize, but I encountered an error while trying to retrieve the immunization records for patient PAT001. Let me try getting the patient's basic information first to better assist you."
+              },
+              {
+                "toolUse": {
+                  "toolUseId": "tooluse_V90UuVxOQQ26kb8lUwnfnQ",
+                  "name": "LocalFHIRAPI___getPatient",
+                  "input": {
+                    "patient_id": "PAT001"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "toolResult": {
+                  "toolUseId": "tooluse_V90UuVxOQQ26kb8lUwnfnQ",
+                  "content": [
+                    {
+                      "text": "An internal error occurred. Please retry later."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I apologize for the technical difficulties. I'm currently unable to access the immunization records and patient information for PAT001 due to system errors. \n\n**What I can help you with:**\n- Once the system is back online, I can retrieve the immunization records for patient PAT001\n- I can help you book an appointment for immunizations on a date of your choosing\n- I can check available appointment slots with doctors\n\n**Could you please:**\n1. Try again in a moment, or\n2. Let me know if you'd like to proceed with booking an immunization appointment for a specific date?\n\nI apologize for the inconvenience!"
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "text": "Show me the immunization history for patient PAT001"
+              }
+            ]
+          }
+        ],
+        "system": [
+          {
+            "text": "You are a helpful healthcare virtual assistant that helps the user with booking appointment for a immunization for a child.\nUse the tools/functions available to you to help the user.\n\nFollow these strict rules:\n1. Use patient_id=PAT001 for patient operations\n2. Only use Immunization EMR for patient_id=PAT001 for searching and booking\n\nDo not make up any information. Ask for clarification if needed.\n\nAlways format your responses in a clear, friendly manner with proper spacing and structure.\n"
+          }
+        ],
+        "inferenceConfig": {
+          "temperature": 0.7
+        },
+        "toolConfig": {
+          "tools": [
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___bookAppointment",
+                "description": "Book appointment for the given datetime slot",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "date_string": {
+                        "examples": [
+                          "2025-01-15 10:00"
+                        ],
+                        "type": "string",
+                        "description": "Preferred date and time in YYYY-MM-DD HH:MM format"
+                      }
+                    },
+                    "required": [
+                      "date_string"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___getPatient",
+                "description": "Returns patient details based on patient id from mock data",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "patient_id": {
+                        "examples": [
+                          "patient-001"
+                        ],
+                        "type": "string",
+                        "description": "ID of the patient to return (e.g., patient-001, patient-002, patient-003)"
+                      }
+                    },
+                    "required": [
+                      "patient_id"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___getSlots",
+                "description": "Returns doctor details along with available datetime slots near the requested date",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "date_string": {
+                        "examples": [
+                          "2025-01-15"
+                        ],
+                        "type": "string",
+                        "description": "Preferred date in YYYY-MM-DD format"
+                      }
+                    },
+                    "required": [
+                      "date_string"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___searchImmunization",
+                "description": "Search immunization records based on Patient ID",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "search_value": {
+                        "examples": [
+                          "patient-001"
+                        ],
+                        "type": "string",
+                        "description": "Patient ID to search for immunization records"
+                      }
+                    },
+                    "required": [
+                      "search_value"
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "toolChoice": {
+            "auto": {}
+          }
+        }
+      },
+      "inputTokenCount": 1427,
+      "cacheReadInputTokenCount": 0,
+      "cacheWriteInputTokenCount": 0
+    },
+    "output": {
+      "outputContentType": "application/json",
+      "outputBodyJson": {
+        "output": {
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I'll retrieve the immunization history for patient PAT001."
+              },
+              {
+                "toolUse": {
+                  "toolUseId": "tooluse_x0mQCRa3SO-0lbWLcsqWmQ",
+                  "name": "LocalFHIRAPI___searchImmunization",
+                  "type": "tool_use",
+                  "input": {
+                    "search_value": "PAT001"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "stopReason": "tool_use",
+        "metrics": {
+          "latencyMs": 1100
+        },
+        "usage": {
+          "inputTokens": 1427,
+          "outputTokens": 80,
+          "totalTokens": 1507
+        }
+      },
+      "outputTokenCount": 80
+    },
+    "inferenceRegion": "us-east-2",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:19Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "ae35397c-edb9-40bb-8bc3-65cf6178f5f6",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:19Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "5bc74c14-60cc-4b60-ab7c-19a24569e7ae",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:21Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "0c435015-bcf3-4b39-be80-04d66a14928d",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:23Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "08b7f2f2-05cc-46aa-bc7c-203295932e2c",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:26Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "75a7fcd8-00b1-411e-a9fb-5341f4850b40",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:31Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "a1ab83c1-4410-4b5a-880a-6f3aabe85a37",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:32Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "6cd65d57-3392-4f59-82d1-974395623177",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:33Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "1e5c5257-428d-4bdd-8e90-d09b8acea380",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:36Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "a5207e3a-4f6c-4d7d-8a35-7373c8032591",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:38Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "7b3a11e6-a5c5-4334-a2b3-4fe63a629ecb",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "input": {
+      "inputContentType": "application/json",
+      "inputBodyJson": {
+        "messages": [
+          {
+            "role": "user",
+            "content": [
+              {
+                "text": "What immunizations does patient PAT001 need?"
+              }
+            ]
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I'll search for the immunization records for patient PAT001 to see what immunizations they need."
+              },
+              {
+                "toolUse": {
+                  "toolUseId": "tooluse_50nrLqI5R2ChSyM6RY4NFw",
+                  "name": "LocalFHIRAPI___searchImmunization",
+                  "input": {
+                    "search_value": "PAT001"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "toolResult": {
+                  "toolUseId": "tooluse_50nrLqI5R2ChSyM6RY4NFw",
+                  "content": [
+                    {
+                      "text": "An internal error occurred. Please retry later."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I apologize, but I encountered an error while trying to retrieve the immunization records for patient PAT001. Let me try getting the patient's basic information first to better assist you."
+              },
+              {
+                "toolUse": {
+                  "toolUseId": "tooluse_V90UuVxOQQ26kb8lUwnfnQ",
+                  "name": "LocalFHIRAPI___getPatient",
+                  "input": {
+                    "patient_id": "PAT001"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "toolResult": {
+                  "toolUseId": "tooluse_V90UuVxOQQ26kb8lUwnfnQ",
+                  "content": [
+                    {
+                      "text": "An internal error occurred. Please retry later."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I apologize for the technical difficulties. I'm currently unable to access the immunization records and patient information for PAT001 due to system errors. \n\n**What I can help you with:**\n- Once the system is back online, I can retrieve the immunization records for patient PAT001\n- I can help you book an appointment for immunizations on a date of your choosing\n- I can check available appointment slots with doctors\n\n**Could you please:**\n1. Try again in a moment, or\n2. Let me know if you'd like to proceed with booking an immunization appointment for a specific date?\n\nI apologize for the inconvenience!"
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "text": "Show me the immunization history for patient PAT001"
+              }
+            ]
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I'll retrieve the immunization history for patient PAT001."
+              },
+              {
+                "toolUse": {
+                  "toolUseId": "tooluse_x0mQCRa3SO-0lbWLcsqWmQ",
+                  "name": "LocalFHIRAPI___searchImmunization",
+                  "input": {
+                    "search_value": "PAT001"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "toolResult": {
+                  "toolUseId": "tooluse_x0mQCRa3SO-0lbWLcsqWmQ",
+                  "content": [
+                    {
+                      "text": "An internal error occurred. Please retry later."
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "system": [
+          {
+            "text": "You are a helpful healthcare virtual assistant that helps the user with booking appointment for a immunization for a child.\nUse the tools/functions available to you to help the user.\n\nFollow these strict rules:\n1. Use patient_id=PAT001 for patient operations\n2. Only use Immunization EMR for patient_id=PAT001 for searching and booking\n\nDo not make up any information. Ask for clarification if needed.\n\nAlways format your responses in a clear, friendly manner with proper spacing and structure.\n"
+          }
+        ],
+        "inferenceConfig": {
+          "temperature": 0.7
+        },
+        "toolConfig": {
+          "tools": [
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___bookAppointment",
+                "description": "Book appointment for the given datetime slot",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "date_string": {
+                        "examples": [
+                          "2025-01-15 10:00"
+                        ],
+                        "type": "string",
+                        "description": "Preferred date and time in YYYY-MM-DD HH:MM format"
+                      }
+                    },
+                    "required": [
+                      "date_string"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___getPatient",
+                "description": "Returns patient details based on patient id from mock data",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "patient_id": {
+                        "examples": [
+                          "patient-001"
+                        ],
+                        "type": "string",
+                        "description": "ID of the patient to return (e.g., patient-001, patient-002, patient-003)"
+                      }
+                    },
+                    "required": [
+                      "patient_id"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___getSlots",
+                "description": "Returns doctor details along with available datetime slots near the requested date",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "date_string": {
+                        "examples": [
+                          "2025-01-15"
+                        ],
+                        "type": "string",
+                        "description": "Preferred date in YYYY-MM-DD format"
+                      }
+                    },
+                    "required": [
+                      "date_string"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___searchImmunization",
+                "description": "Search immunization records based on Patient ID",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "search_value": {
+                        "examples": [
+                          "patient-001"
+                        ],
+                        "type": "string",
+                        "description": "Patient ID to search for immunization records"
+                      }
+                    },
+                    "required": [
+                      "search_value"
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "toolChoice": {
+            "auto": {}
+          }
+        }
+      },
+      "inputTokenCount": 1535,
+      "cacheReadInputTokenCount": 0,
+      "cacheWriteInputTokenCount": 0
+    },
+    "output": {
+      "outputContentType": "application/json",
+      "outputBodyJson": {
+        "output": {
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I apologize, but I'm experiencing a system error when trying to access the immunization history for patient PAT001. The system is currently unable to retrieve the records.\n\n**Possible next steps:**\n- Please try again in a few moments as this may be a temporary system issue\n- If you need immediate assistance, please contact your healthcare provider directly\n- Once the system is restored, I'll be able to show you the complete immunization history\n\nI sincerely apologize for the inconvenience. Is there anything else I can help you with in the meantime?"
+              }
+            ]
+          }
+        },
+        "stopReason": "end_turn",
+        "metrics": {
+          "latencyMs": 2990
+        },
+        "usage": {
+          "inputTokens": 1535,
+          "outputTokens": 123,
+          "totalTokens": 1658
+        }
+      },
+      "outputTokenCount": 123
+    },
+    "inferenceRegion": "us-west-2",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:42Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "7e88f5b1-a4b4-4caf-8d52-a9e71ef43941",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:42Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "37a998c3-559a-4d49-84de-d98ec77467e4",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:43Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "aa9b88c8-e47d-4878-a29f-db9f08d1bc85",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:44Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "cd474c43-7c08-4667-aaa8-424655fe2b78",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:52Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "2fb83084-6ffd-4805-8b75-c2527199cca1",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:56Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "b2768be4-5db6-4c24-83a9-05a5f78c4371",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "errorCode": "ThrottlingException",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  },
+  {
+    "timestamp": "2025-12-17T01:10:57Z",
+    "accountId": "027425703396",
+    "region": "us-east-1",
+    "requestId": "f624a331-420e-4b74-817f-ce0eb8102044",
+    "operation": "ConverseStream",
+    "modelId": "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "identity": {
+      "arn": "arn:aws:iam::027425703396:user/robbat1"
+    },
+    "input": {
+      "inputContentType": "application/json",
+      "inputBodyJson": {
+        "messages": [
+          {
+            "role": "user",
+            "content": [
+              {
+                "text": "What immunizations does patient PAT001 need?"
+              }
+            ]
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I'll search for the immunization records for patient PAT001 to see what immunizations they need."
+              },
+              {
+                "toolUse": {
+                  "toolUseId": "tooluse_50nrLqI5R2ChSyM6RY4NFw",
+                  "name": "LocalFHIRAPI___searchImmunization",
+                  "input": {
+                    "search_value": "PAT001"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "toolResult": {
+                  "toolUseId": "tooluse_50nrLqI5R2ChSyM6RY4NFw",
+                  "content": [
+                    {
+                      "text": "An internal error occurred. Please retry later."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I apologize, but I encountered an error while trying to retrieve the immunization records for patient PAT001. Let me try getting the patient's basic information first to better assist you."
+              },
+              {
+                "toolUse": {
+                  "toolUseId": "tooluse_V90UuVxOQQ26kb8lUwnfnQ",
+                  "name": "LocalFHIRAPI___getPatient",
+                  "input": {
+                    "patient_id": "PAT001"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "toolResult": {
+                  "toolUseId": "tooluse_V90UuVxOQQ26kb8lUwnfnQ",
+                  "content": [
+                    {
+                      "text": "An internal error occurred. Please retry later."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I apologize for the technical difficulties. I'm currently unable to access the immunization records and patient information for PAT001 due to system errors. \n\n**What I can help you with:**\n- Once the system is back online, I can retrieve the immunization records for patient PAT001\n- I can help you book an appointment for immunizations on a date of your choosing\n- I can check available appointment slots with doctors\n\n**Could you please:**\n1. Try again in a moment, or\n2. Let me know if you'd like to proceed with booking an immunization appointment for a specific date?\n\nI apologize for the inconvenience!"
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "text": "Show me the immunization history for patient PAT001"
+              }
+            ]
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I'll retrieve the immunization history for patient PAT001."
+              },
+              {
+                "toolUse": {
+                  "toolUseId": "tooluse_x0mQCRa3SO-0lbWLcsqWmQ",
+                  "name": "LocalFHIRAPI___searchImmunization",
+                  "input": {
+                    "search_value": "PAT001"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "toolResult": {
+                  "toolUseId": "tooluse_x0mQCRa3SO-0lbWLcsqWmQ",
+                  "content": [
+                    {
+                      "text": "An internal error occurred. Please retry later."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I apologize, but I'm experiencing a system error when trying to access the immunization history for patient PAT001. The system is currently unable to retrieve the records.\n\n**Possible next steps:**\n- Please try again in a few moments as this may be a temporary system issue\n- If you need immediate assistance, please contact your healthcare provider directly\n- Once the system is restored, I'll be able to show you the complete immunization history\n\nI sincerely apologize for the inconvenience. Is there anything else I can help you with in the meantime?"
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "text": "What appointment slots are available for immunization?"
+              }
+            ]
+          }
+        ],
+        "system": [
+          {
+            "text": "You are a helpful healthcare virtual assistant that helps the user with booking appointment for a immunization for a child.\nUse the tools/functions available to you to help the user.\n\nFollow these strict rules:\n1. Use patient_id=PAT001 for patient operations\n2. Only use Immunization EMR for patient_id=PAT001 for searching and booking\n\nDo not make up any information. Ask for clarification if needed.\n\nAlways format your responses in a clear, friendly manner with proper spacing and structure.\n"
+          }
+        ],
+        "inferenceConfig": {
+          "temperature": 0.7
+        },
+        "toolConfig": {
+          "tools": [
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___bookAppointment",
+                "description": "Book appointment for the given datetime slot",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "date_string": {
+                        "examples": [
+                          "2025-01-15 10:00"
+                        ],
+                        "type": "string",
+                        "description": "Preferred date and time in YYYY-MM-DD HH:MM format"
+                      }
+                    },
+                    "required": [
+                      "date_string"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___getPatient",
+                "description": "Returns patient details based on patient id from mock data",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "patient_id": {
+                        "examples": [
+                          "patient-001"
+                        ],
+                        "type": "string",
+                        "description": "ID of the patient to return (e.g., patient-001, patient-002, patient-003)"
+                      }
+                    },
+                    "required": [
+                      "patient_id"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___getSlots",
+                "description": "Returns doctor details along with available datetime slots near the requested date",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "date_string": {
+                        "examples": [
+                          "2025-01-15"
+                        ],
+                        "type": "string",
+                        "description": "Preferred date in YYYY-MM-DD format"
+                      }
+                    },
+                    "required": [
+                      "date_string"
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "toolSpec": {
+                "name": "LocalFHIRAPI___searchImmunization",
+                "description": "Search immunization records based on Patient ID",
+                "inputSchema": {
+                  "json": {
+                    "type": "object",
+                    "properties": {
+                      "search_value": {
+                        "examples": [
+                          "patient-001"
+                        ],
+                        "type": "string",
+                        "description": "Patient ID to search for immunization records"
+                      }
+                    },
+                    "required": [
+                      "search_value"
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "toolChoice": {
+            "auto": {}
+          }
+        }
+      },
+      "inputTokenCount": 1670,
+      "cacheReadInputTokenCount": 0,
+      "cacheWriteInputTokenCount": 0
+    },
+    "output": {
+      "outputContentType": "application/json",
+      "outputBodyJson": {
+        "output": {
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "text": "I'd be happy to help you find available appointment slots for immunization! \n\nTo check what slots are available, I need to know:\n\n**What date would you prefer for the immunization appointment?**\n\nPlease provide a date in YYYY-MM-DD format (for example: 2025-01-20), and I'll show you the available time slots with doctor information."
+              }
+            ]
+          }
+        },
+        "stopReason": "end_turn",
+        "metrics": {
+          "latencyMs": 1908
+        },
+        "usage": {
+          "inputTokens": 1670,
+          "outputTokens": 84,
+          "totalTokens": 1754
+        }
+      },
+      "outputTokenCount": 84
+    },
+    "inferenceRegion": "ap-northeast-2",
+    "schemaType": "ModelInvocationLog",
+    "schemaVersion": "1.0"
+  }
+]

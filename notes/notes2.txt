@@ -1,0 +1,40 @@
+ssh-keygen -R "[127.0.0.1]:2222"
+
+curl -X POST "http://localhost:5432/agents" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: SfE4Vf5jkVQ4v27MrNC72R6H" \
+  -d '{
+    "method": "create_id",
+    "params": {
+      "length": 8,
+      "metadata": {
+        "role": "researcher",
+        "goal": "Explore new APIs",
+        "agent": "test-agent-1"
+      }
+    },
+    "id": "1"
+  }'
+
+{"jsonrpc":"2.0","result":{"status":"ok","id":"AV46PAnT","collection":"AgentMetadata"},"id":"1"}%
+
+
+curl -X POST "http://localhost:5432/tasks" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: SfE4Vf5jkVQ4v27MrNC72R6H" \
+  -d '{
+    "method": "create_id",
+    "params": {
+      "agent_id": "AV46PAnT",
+      "length": 8,
+      "metadata": {
+        "task_name": "collect-api-data",
+        "description": "Gather data from multiple API sources",
+        "priority": "high"
+      }
+    },
+    "id": "42"
+  }'
+
+
+

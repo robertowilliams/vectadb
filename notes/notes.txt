@@ -1,0 +1,49 @@
+### list docs with fields: ...
+curl -X POST http://localhost:8081/v1/graphql   -H "Content-Type: application/json"   -d '{
+    "query": "{ Get { AgentMetadata { shortid role goal backstory } } }"
+  }' | jq
+
+
+
+### Create a new vector (and doc)
+
+curl -X POST http://localhost:5432/ \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"create_id","params":{"length":6,"deterministic":false,"metadata":{"role":"Researcher","goal":"Look up graph papers","backstory":"You work in an R&D company specializing in Graph Neural Networks."}},"id":1}' | jq
+
+
+
+
+### Search
+
+curl -X POST http://localhost:8081/v1/graphql \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "{ Get { AgentMetadata(where: {path: [\"role\"], operator: Equal, valueText: \"Researcher\"}) { shortid role goal backstory } } }"
+  }' | jq
+
+
+### Semantic Search
+curl -X POST http://localhost:8081/v1/graphql \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "{
+      Get {
+        AgentMetadata(
+          nearText: { concepts: [\"graph neural networks\"] }
+          limit: 3
+        ) {
+          shortid
+          role
+          goal
+          backstory
+        }
+      }
+    }"
+  }' | jq
+
+
+
+curl -X POST http://localhost:8081/v1/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ Get { AgentMetadata(nearText: { concepts: [\"graph neural networks\"] }, limit: 3) { shortid role goal backstory } } }"}' | jq
