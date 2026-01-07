@@ -48,6 +48,10 @@ pub fn create_router_with_state(state: AppState) -> Router {
         // Hybrid queries
         .route("/api/v1/query/hybrid", post(handlers::hybrid_query))
 
+        // Event ingestion (Phase 5)
+        .route("/api/v1/events", post(handlers::ingest_event))
+        .route("/api/v1/events/batch", post(handlers::ingest_events_bulk))
+
         // Add CORS middleware
         .layer(CorsLayer::permissive())
 

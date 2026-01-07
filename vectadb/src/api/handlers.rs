@@ -960,6 +960,364 @@ pub async fn hybrid_query(
 }
 
 // ============================================================================
+// Event Ingestion (Phase 5)
+// ============================================================================
+
+/// Ingest a single event
+pub async fn ingest_event(
+    State(state): State<AppState>,
+    Json(request): Json<EventIngestionRequest>,
+) -> Result<Json<EventIngestionResponse>, (StatusCode, Json<ErrorResponse>)> {
+    let surreal = state.surreal.as_ref().ok_or_else(|| {
+        (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(ErrorResponse::new(
+                "DatabaseNotAvailable",
+                "Database not connected",
+            )),
+        )
+    })?;
+
+    let embedding_service = state.embedding_service.as_ref().ok_or_else(|| {
+        (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(ErrorResponse::new(
+                "ServiceNotAvailable",
+                "Embedding service not available",
+            )),
+        )
+    })?;
+
+    // Get or create trace
+    let trace_id = if let Some(ref tid) = request.trace_id {
+        tid.clone()
+    } else if let Some(ref sid) = request.session_id {
+        get_or_create_trace_by_session(&state, sid, request.agent_id.as_deref())
+            .await
+            .map_err(|e| {
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(ErrorResponse::new(
+                        "TraceError",
+                        format!("Failed to get/create trace: {}", e),
+                    )),
+                )
+            })?
+    } else {
+        // No trace_id or session_id - create a new trace
+        create_trace_for_session(&state, "default", request.agent_id.as_deref())
+            .await
+            .map_err(|e| {
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(ErrorResponse::new(
+                        "TraceError",
+                        format!("Failed to create trace: {}", e),
+                    )),
+                )
+            })?
+    };
+
+    // Create event entity
+    let event_id = create_event_entity(surreal, &request, &trace_id)
+        .await
+        .map_err(|e| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ErrorResponse::new(
+                    "DatabaseError",
+                    format!("Failed to create event: {}", e),
+                )),
+            )
+        })?;
+
+    // Generate and store embedding if properties contain text
+    let text_content = extract_text_from_json(&request.properties);
+    if !text_content.is_empty() {
+        if let Ok(embedding) = embedding_service.encode(&text_content) {
+            store_event_vector(
+                state.qdrant.as_ref().unwrap(),
+                &event_id,
+                embedding,
+            )
+            .await
+            .ok(); // Log but don't fail on vector storage error
+        }
+    }
+
+    Ok(Json(EventIngestionResponse {
+        event_id,
+        trace_id,
+        created_at: request.timestamp,
+    }))
+}
+
+/// Ingest events in bulk
+pub async fn ingest_events_bulk(
+    State(state): State<AppState>,
+    Json(request): Json<BulkEventIngestionRequest>,
+) -> Result<Json<BulkEventIngestionResponse>, (StatusCode, Json<ErrorResponse>)> {
+    let surreal = state.surreal.as_ref().ok_or_else(|| {
+        (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(ErrorResponse::new(
+                "DatabaseNotAvailable",
+                "Database not connected",
+            )),
+        )
+    })?;
+
+    let embedding_service = state.embedding_service.as_ref();
+
+    let mut ingested = 0;
+    let mut failed = 0;
+    let mut trace_ids = Vec::new();
+    let mut errors = Vec::new();
+
+    for (index, event_request) in request.events.iter().enumerate() {
+        // Get or create trace
+        let trace_id_result = if let Some(ref tid) = event_request.trace_id {
+            Ok(tid.clone())
+        } else if let Some(ref sid) = event_request.session_id {
+            if request.options.auto_create_traces {
+                get_or_create_trace_by_session(&state, sid, event_request.agent_id.as_deref()).await
+            } else {
+                Err(anyhow::anyhow!("Trace not found and auto-create disabled"))
+            }
+        } else {
+            // No trace_id or session_id
+            if request.options.auto_create_traces {
+                create_trace_for_session(&state, "default", event_request.agent_id.as_deref()).await
+            } else {
+                Err(anyhow::anyhow!("No trace specified and auto-create disabled"))
+            }
+        };
+
+        let trace_id = match trace_id_result {
+            Ok(tid) => tid,
+            Err(e) => {
+                failed += 1;
+                errors.push(IngestionError {
+                    index,
+                    error: format!("Failed to get/create trace: {}", e),
+                });
+                continue;
+            }
+        };
+
+        // Create event entity
+        match create_event_entity(surreal, event_request, &trace_id).await {
+            Ok(event_id) => {
+                // Generate and store embedding if requested
+                if request.options.generate_embeddings {
+                    if let Some(embedding_svc) = embedding_service {
+                        let text_content = extract_text_from_json(&event_request.properties);
+                        if !text_content.is_empty() {
+                            if let Ok(embedding) = embedding_svc.encode(&text_content) {
+                                if let Some(qdrant) = state.qdrant.as_ref() {
+                                    store_event_vector(qdrant, &event_id, embedding)
+                                        .await
+                                        .ok(); // Don't fail on vector storage error
+                                }
+                            }
+                        }
+                    }
+                }
+
+                ingested += 1;
+                if !trace_ids.contains(&trace_id) {
+                    trace_ids.push(trace_id);
+                }
+            }
+            Err(e) => {
+                failed += 1;
+                errors.push(IngestionError {
+                    index,
+                    error: format!("Failed to create event: {}", e),
+                });
+            }
+        }
+    }
+
+    Ok(Json(BulkEventIngestionResponse {
+        ingested,
+        failed,
+        trace_ids,
+        errors,
+    }))
+}
+
+/// Get or create trace by session_id with resilient detection
+async fn get_or_create_trace_by_session(
+    state: &AppState,
+    session_id: &str,
+    agent_id: Option<&str>,
+) -> Result<String, anyhow::Error> {
+    let surreal = state
+        .surreal
+        .as_ref()
+        .ok_or_else(|| anyhow::anyhow!("Database not available"))?;
+
+    // Strategy 1: Try exact session_id match first
+    #[derive(Debug, serde::Deserialize)]
+    struct TraceRecord {
+        id: String,
+        start_time: Option<String>,
+    }
+
+    let query = format!(
+        "SELECT id, start_time FROM agent_trace WHERE session_id = '{}' ORDER BY start_time DESC LIMIT 1",
+        session_id.replace('\'', "\\'")
+    );
+
+    let mut result = surreal.db().query(query).await?;
+    let traces: Vec<TraceRecord> = result.take(0).unwrap_or_default();
+
+    if let Some(trace) = traces.first() {
+        tracing::debug!("Found trace by session_id: {}", trace.id);
+        return Ok(trace.id.clone());
+    }
+
+    // Strategy 2: If agent_id provided, check for recent trace (within 1 hour)
+    if let Some(aid) = agent_id {
+        let query = format!(
+            "SELECT id, start_time FROM agent_trace WHERE agent_id = '{}' AND status = 'running' AND start_time > time::now() - 1h ORDER BY start_time DESC LIMIT 1",
+            aid.replace('\'', "\\'")
+        );
+
+        let mut result = surreal.db().query(query).await?;
+        let traces: Vec<TraceRecord> = result.take(0).unwrap_or_default();
+
+        if let Some(trace) = traces.first() {
+            tracing::debug!("Found trace by agent_id: {}", trace.id);
+            return Ok(trace.id.clone());
+        }
+    }
+
+    // Strategy 3: Create new trace
+    tracing::info!("Creating new trace for session_id: {}", session_id);
+    create_trace_for_session(state, session_id, agent_id).await
+}
+
+/// Create a new trace for a session
+async fn create_trace_for_session(
+    state: &AppState,
+    session_id: &str,
+    agent_id: Option<&str>,
+) -> Result<String, anyhow::Error> {
+    let surreal = state
+        .surreal
+        .as_ref()
+        .ok_or_else(|| anyhow::anyhow!("Database not available"))?;
+
+    let trace_id = uuid::Uuid::new_v4().to_string();
+    let now = chrono::Utc::now();
+
+    let agent_id_str = agent_id.map(|s| format!("'{}'", s.replace('\'', "\\'")))
+        .unwrap_or_else(|| "NONE".to_string());
+
+    let query = format!(
+        "CREATE agent_trace CONTENT {{
+            id: '{}',
+            session_id: '{}',
+            agent_id: {},
+            status: 'running',
+            start_time: '{}',
+            created_at: '{}',
+            updated_at: '{}'
+        }}",
+        trace_id,
+        session_id.replace('\'', "\\'"),
+        agent_id_str,
+        now.to_rfc3339(),
+        now.to_rfc3339(),
+        now.to_rfc3339()
+    );
+
+    surreal.db().query(query).await?;
+
+    Ok(trace_id)
+}
+
+/// Create event entity in SurrealDB
+async fn create_event_entity(
+    surreal: &SurrealDBClient,
+    request: &EventIngestionRequest,
+    trace_id: &str,
+) -> Result<String, anyhow::Error> {
+    let event_id = uuid::Uuid::new_v4().to_string();
+    let now = chrono::Utc::now();
+
+    // Build event properties as JSON
+    let mut event_data = serde_json::json!({
+        "id": event_id,
+        "trace_id": trace_id,
+        "timestamp": request.timestamp.to_rfc3339(),
+        "properties": request.properties,
+        "created_at": now.to_rfc3339(),
+        "updated_at": now.to_rfc3339(),
+    });
+
+    // Add optional fields
+    if let Some(ref event_type) = request.event_type {
+        event_data["event_type"] = serde_json::json!(event_type);
+    }
+    if let Some(ref agent_id) = request.agent_id {
+        event_data["agent_id"] = serde_json::json!(agent_id);
+    }
+    if let Some(ref session_id) = request.session_id {
+        event_data["session_id"] = serde_json::json!(session_id);
+    }
+    if let Some(ref source) = request.source {
+        event_data["source"] = serde_json::json!(source);
+    }
+
+    let query = format!("CREATE agent_event CONTENT {}", event_data);
+
+    surreal.db().query(query).await?;
+
+    // Create relation from trace to event
+    let trace_record_id = format!("agent_trace:`{}`", trace_id);
+    let event_record_id = format!("agent_event:`{}`", event_id);
+
+    let relation_query = format!(
+        "RELATE {}->contains->{} CONTENT {{
+            created_at: '{}'
+        }}",
+        trace_record_id,
+        event_record_id,
+        now.to_rfc3339()
+    );
+
+    surreal.db().query(relation_query).await?;
+
+    Ok(event_id)
+}
+
+/// Store event embedding in Qdrant
+async fn store_event_vector(
+    qdrant: &QdrantClient,
+    event_id: &str,
+    embedding: Vec<f32>,
+) -> Result<(), anyhow::Error> {
+    const EVENTS_COLLECTION: &str = "agent_events";
+
+    // Ensure collection exists
+    if !qdrant.collection_exists(EVENTS_COLLECTION).await? {
+        qdrant
+            .create_collection(EVENTS_COLLECTION, embedding.len() as u64)
+            .await?;
+    }
+
+    // Store embedding
+    qdrant
+        .upsert_embedding(EVENTS_COLLECTION, event_id, embedding)
+        .await?;
+
+    Ok(())
+}
+
+// ============================================================================
 // Helper Functions
 // ============================================================================
 
@@ -983,4 +1341,30 @@ fn extract_text_from_properties(properties: &HashMap<String, serde_json::Value>)
     }
 
     text_parts.join(". ")
+}
+
+/// Extract text content from JSON value for embedding generation
+fn extract_text_from_json(value: &serde_json::Value) -> String {
+    match value {
+        serde_json::Value::String(s) => s.clone(),
+        serde_json::Value::Object(map) => {
+            let mut text_parts = Vec::new();
+            for (key, val) in map {
+                match val {
+                    serde_json::Value::String(s) => {
+                        text_parts.push(format!("{}: {}", key, s));
+                    }
+                    serde_json::Value::Number(n) => {
+                        text_parts.push(format!("{}: {}", key, n));
+                    }
+                    serde_json::Value::Bool(b) => {
+                        text_parts.push(format!("{}: {}", key, b));
+                    }
+                    _ => {}
+                }
+            }
+            text_parts.join(". ")
+        }
+        _ => String::new(),
+    }
 }

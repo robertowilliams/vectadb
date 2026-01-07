@@ -267,3 +267,108 @@ pub use crate::query::{
     HybridQuery, VectorQuery, GraphQuery, CombinedQuery,
     TraversalDirection, MergeStrategy, QueryResult,
 };
+
+// ============================================================================
+// Event Ingestion (Phase 5)
+// ============================================================================
+
+/// Event ingestion request - flexible schema for log-based events
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EventIngestionRequest {
+    /// Optional: Link to existing trace
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trace_id: Option<String>,
+
+    /// Required: Event timestamp
+    pub timestamp: chrono::DateTime<chrono::Utc>,
+
+    /// Optional: Event classification (tool_call, decision, error, etc.)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub event_type: Option<String>,
+
+    /// Optional: Agent identifier
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub agent_id: Option<String>,
+
+    /// Optional: Session/request identifier (for trace grouping)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub session_id: Option<String>,
+
+    /// Required: Event properties (flexible JSON)
+    pub properties: serde_json::Value,
+
+    /// Optional: Original log source metadata
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<LogSource>,
+}
+
+/// Log source metadata
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LogSource {
+    /// Source system (cloudwatch, datadog, etc.)
+    pub system: String,
+
+    /// Log group name
+    pub log_group: String,
+
+    /// Log stream name
+    pub log_stream: String,
+
+    /// Original log event ID
+    pub log_id: String,
+}
+
+/// Bulk event ingestion request
+#[derive(Debug, Deserialize)]
+pub struct BulkEventIngestionRequest {
+    /// List of events to ingest
+    pub events: Vec<EventIngestionRequest>,
+
+    /// Ingestion options
+    #[serde(default)]
+    pub options: IngestionOptions,
+}
+
+/// Ingestion options
+#[derive(Debug, Deserialize, Default)]
+pub struct IngestionOptions {
+    /// Auto-create traces from session_id if not exists
+    #[serde(default = "default_true")]
+    pub auto_create_traces: bool,
+
+    /// Generate embeddings for semantic search
+    #[serde(default = "default_true")]
+    pub generate_embeddings: bool,
+
+    /// Extract event relationships (causality)
+    #[serde(default)]
+    pub extract_relationships: bool,
+}
+
+fn default_true() -> bool {
+    true
+}
+
+/// Event ingestion response
+#[derive(Debug, Serialize)]
+pub struct EventIngestionResponse {
+    pub event_id: String,
+    pub trace_id: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+}
+
+/// Bulk event ingestion response
+#[derive(Debug, Serialize)]
+pub struct BulkEventIngestionResponse {
+    pub ingested: usize,
+    pub failed: usize,
+    pub trace_ids: Vec<String>,
+    pub errors: Vec<IngestionError>,
+}
+
+/// Ingestion error details
+#[derive(Debug, Serialize)]
+pub struct IngestionError {
+    pub index: usize,
+    pub error: String,
+}

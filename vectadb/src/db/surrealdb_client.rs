@@ -29,6 +29,11 @@ struct OntologyRecord {
 }
 
 impl SurrealDBClient {
+    /// Get reference to the underlying Surreal database connection
+    pub fn db(&self) -> &Surreal<Client> {
+        &self.db
+    }
+
     /// Create a new SurrealDB client and connect
     pub async fn new(config: &DatabaseConfig) -> Result<Self> {
         info!("Connecting to SurrealDB at {}", config.surrealdb.endpoint);
@@ -130,7 +135,46 @@ impl SurrealDBClient {
             .await
             .context("Failed to define relation table")?;
 
-        debug!("SurrealDB schema initialized");
+        // Phase 5: Define agent_trace table
+        self.db
+            .query(
+                "DEFINE TABLE IF NOT EXISTS agent_trace SCHEMAFULL;
+                 DEFINE FIELD IF NOT EXISTS id ON agent_trace TYPE string;
+                 DEFINE FIELD IF NOT EXISTS session_id ON agent_trace TYPE string;
+                 DEFINE FIELD IF NOT EXISTS agent_id ON agent_trace TYPE option<string>;
+                 DEFINE FIELD IF NOT EXISTS status ON agent_trace TYPE string;
+                 DEFINE FIELD IF NOT EXISTS start_time ON agent_trace TYPE string;
+                 DEFINE FIELD IF NOT EXISTS created_at ON agent_trace TYPE string;
+                 DEFINE FIELD IF NOT EXISTS updated_at ON agent_trace TYPE string;
+                 DEFINE INDEX IF NOT EXISTS idx_session_id ON agent_trace COLUMNS session_id;
+                 DEFINE INDEX IF NOT EXISTS idx_agent_id ON agent_trace COLUMNS agent_id;
+                 DEFINE INDEX IF NOT EXISTS idx_start_time ON agent_trace COLUMNS start_time;",
+            )
+            .await
+            .context("Failed to define agent_trace table")?;
+
+        // Phase 5: Define agent_event table
+        self.db
+            .query(
+                "DEFINE TABLE IF NOT EXISTS agent_event SCHEMAFULL;
+                 DEFINE FIELD IF NOT EXISTS id ON agent_event TYPE string;
+                 DEFINE FIELD IF NOT EXISTS trace_id ON agent_event TYPE string;
+                 DEFINE FIELD IF NOT EXISTS timestamp ON agent_event TYPE string;
+                 DEFINE FIELD IF NOT EXISTS event_type ON agent_event TYPE option<string>;
+                 DEFINE FIELD IF NOT EXISTS agent_id ON agent_event TYPE option<string>;
+                 DEFINE FIELD IF NOT EXISTS session_id ON agent_event TYPE option<string>;
+                 DEFINE FIELD IF NOT EXISTS properties ON agent_event TYPE object;
+                 DEFINE FIELD IF NOT EXISTS source ON agent_event TYPE option<object>;
+                 DEFINE FIELD IF NOT EXISTS created_at ON agent_event TYPE string;
+                 DEFINE FIELD IF NOT EXISTS updated_at ON agent_event TYPE string;
+                 DEFINE INDEX IF NOT EXISTS idx_trace_id ON agent_event COLUMNS trace_id;
+                 DEFINE INDEX IF NOT EXISTS idx_timestamp ON agent_event COLUMNS timestamp;
+                 DEFINE INDEX IF NOT EXISTS idx_event_type ON agent_event COLUMNS event_type;",
+            )
+            .await
+            .context("Failed to define agent_event table")?;
+
+        debug!("SurrealDB schema initialized (including Phase 5 tables)");
         Ok(())
     }
 
