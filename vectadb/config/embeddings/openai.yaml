@@ -1,0 +1,19 @@
+# OpenAI Embedding Plugin Configuration
+#
+# Usage:
+#   1. Set your OpenAI API key as environment variable: export OPENAI_API_KEY="sk-..."
+#   2. Or replace ${OPENAI_API_KEY} below with your actual key (not recommended for production)
+#
+# Models available:
+#   - text-embedding-3-small (1536 dimensions, $0.02/1M tokens) - Fast and cheap
+#   - text-embedding-3-large (3072 dimensions, $0.13/1M tokens) - Best quality
+#   - text-embedding-ada-002 (1536 dimensions) - Legacy model
+
+name: "openai"
+provider: "openai"
+api_key: "${OPENAI_API_KEY}"
+model: "text-embedding-3-small"
+base_url: "https://api.openai.com/v1"
+dimension: 1536
+batch_size: 2048
+timeout_secs: 30

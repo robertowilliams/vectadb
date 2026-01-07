@@ -1,0 +1,26 @@
+# Cohere Embedding Plugin Configuration
+#
+# Usage:
+#   1. Set your Cohere API key as environment variable: export COHERE_API_KEY="..."
+#   2. Or replace ${COHERE_API_KEY} below with your actual key (not recommended for production)
+#
+# Models available:
+#   - embed-english-v3.0 (1024 dimensions) - Best for English
+#   - embed-multilingual-v3.0 (1024 dimensions) - Multilingual support
+#   - embed-english-light-v3.0 (384 dimensions) - Faster, smaller
+#
+# Input types:
+#   - search_document: For documents to be searched over
+#   - search_query: For search queries
+#   - classification: For classification tasks
+#   - clustering: For clustering tasks
+
+name: "cohere"
+provider: "cohere"
+api_key: "${COHERE_API_KEY}"
+model: "embed-english-v3.0"
+base_url: "https://api.cohere.ai/v1"
+dimension: 1024
+batch_size: 96
+timeout_secs: 30
+input_type: "search_document"

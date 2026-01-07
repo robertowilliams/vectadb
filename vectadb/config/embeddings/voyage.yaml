@@ -1,0 +1,20 @@
+# Voyage Embedding Plugin Configuration
+#
+# Usage:
+#   1. Get API key from your Voyage account
+#   2. Set environment variable: export VOYAGE_API_KEY="your-key"
+#   3. Or replace ${VOYAGE_API_KEY} below with your key (not recommended for production)
+#
+# Models available:
+#   - voyage-2 (1024 dimensions) - Default model
+#
+# Pricing: $0.10/1M tokens
+
+name: "voyage"
+provider: "voyage"
+api_key: "${VOYAGE_API_KEY}"
+model: "voyage-2"
+base_url: "https://api.voyageai.com/v1"
+dimension: 1024
+batch_size: 128
+timeout_secs: 30

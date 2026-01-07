@@ -10,7 +10,7 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 
 use crate::db::{Entity, QdrantClient, Relation, SurrealDBClient};
-use crate::embeddings::EmbeddingService;
+use crate::embeddings::EmbeddingManager;
 use crate::intelligence::OntologyReasoner;
 use crate::ontology::{OntologyLoader, OntologyValidator};
 use crate::query::QueryCoordinator;
@@ -22,7 +22,7 @@ pub struct AppState {
     pub reasoner: Arc<RwLock<Option<OntologyReasoner>>>,
     pub surreal: Option<Arc<SurrealDBClient>>,
     pub qdrant: Option<Arc<QdrantClient>>,
-    pub embedding_service: Option<Arc<EmbeddingService>>,
+    pub embedding_service: Option<Arc<EmbeddingManager>>,
     pub query_coordinator: Option<Arc<QueryCoordinator>>,
 }
 
@@ -41,7 +41,7 @@ impl AppState {
         reasoner: Arc<RwLock<Option<OntologyReasoner>>>,
         surreal: Arc<SurrealDBClient>,
         qdrant: Arc<QdrantClient>,
-        embedding_service: Arc<EmbeddingService>,
+        embedding_service: Arc<EmbeddingManager>,
     ) -> Self {
         let query_coordinator = Arc::new(QueryCoordinator::new(
             surreal.clone(),
@@ -459,7 +459,7 @@ pub async fn create_entity(
     // Generate embedding from text properties
     let text_content = extract_text_from_properties(&entity.properties);
     if !text_content.is_empty() {
-        match embedding_service.encode(&text_content) {
+        match embedding_service.embed(&text_content).await {
             Ok(embedding) => {
                 entity = entity.with_embedding(embedding);
             }
@@ -1034,7 +1034,7 @@ pub async fn ingest_event(
     // Generate and store embedding if properties contain text
     let text_content = extract_text_from_json(&request.properties);
     if !text_content.is_empty() {
-        if let Ok(embedding) = embedding_service.encode(&text_content) {
+        if let Ok(embedding) = embedding_service.embed(&text_content).await {
             store_event_vector(
                 state.qdrant.as_ref().unwrap(),
                 &event_id,
@@ -1113,7 +1113,7 @@ pub async fn ingest_events_bulk(
                     if let Some(embedding_svc) = embedding_service {
                         let text_content = extract_text_from_json(&event_request.properties);
                         if !text_content.is_empty() {
-                            if let Ok(embedding) = embedding_svc.encode(&text_content) {
+                            if let Ok(embedding) = embedding_svc.embed(&text_content).await {
                                 if let Some(qdrant) = state.qdrant.as_ref() {
                                     store_event_vector(qdrant, &event_id, embedding)
                                         .await

@@ -1,0 +1,19 @@
+# Local Embedding Plugin Configuration
+#
+# Uses sentence-transformers-rs for local embedding generation.
+# No API key required, runs entirely on your machine.
+#
+# Models available:
+#   - all-MiniLM-L6-v2 (384 dimensions) - Fast and efficient
+#   - all-MiniLM-L12-v2 (384 dimensions) - Better quality
+#   - all-mpnet-base-v2 (768 dimensions) - Best quality
+#   - BAAI/bge-small-en-v1.5 (384 dimensions) - Good balance
+#
+# Note: First run will download the model (~80-500MB depending on model)
+# Models are cached in ~/.cache/huggingface/
+
+name: "local"
+provider: "local"
+model: "all-MiniLM-L6-v2"
+dimension: 384
+batch_size: 32

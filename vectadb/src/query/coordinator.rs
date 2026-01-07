@@ -8,7 +8,7 @@ use tokio::sync::RwLock;
 use tracing::{debug, info, warn};
 
 use crate::db::{Entity, QdrantClient, SurrealDBClient};
-use crate::embeddings::EmbeddingService;
+use crate::embeddings::EmbeddingManager;
 use crate::intelligence::OntologyReasoner;
 use super::types::*;
 
@@ -18,7 +18,7 @@ pub struct QueryCoordinator {
     surreal: Arc<SurrealDBClient>,
     qdrant: Arc<QdrantClient>,
     reasoner: Arc<RwLock<Option<OntologyReasoner>>>,
-    embedding_service: Arc<EmbeddingService>,
+    embedding_service: Arc<EmbeddingManager>,
 }
 
 impl QueryCoordinator {
@@ -27,7 +27,7 @@ impl QueryCoordinator {
         surreal: Arc<SurrealDBClient>,
         qdrant: Arc<QdrantClient>,
         reasoner: Arc<RwLock<Option<OntologyReasoner>>>,
-        embedding_service: Arc<EmbeddingService>,
+        embedding_service: Arc<EmbeddingManager>,
     ) -> Self {
         Self {
             surreal,
@@ -72,7 +72,8 @@ impl QueryCoordinator {
         // Generate query embedding
         let query_vector = self
             .embedding_service
-            .encode(&query.query_text)
+            .embed(&query.query_text)
+            .await
             .context("Failed to generate query embedding")?;
 
         // Expand entity types if requested

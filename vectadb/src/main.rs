@@ -74,18 +74,16 @@ async fn main() -> Result<()> {
         }
     };
 
-    // Initialize embedding service
-    tracing::info!("Loading embedding model...");
-    let embedding_service = match embeddings::EmbeddingService::new(
-        embeddings::service::EmbeddingModel::BgeSmallEnV1_5,
-        Some(32)
-    ) {
-        Ok(service) => {
-            tracing::info!("Embedding service initialized successfully");
-            Some(Arc::new(service))
+    // Initialize embedding manager (plugin system or local service)
+    tracing::info!("Initializing embedding manager (provider: {})...", config.embedding.provider);
+    let embedding_service = match embeddings::EmbeddingManager::new(config.embedding.clone()).await {
+        Ok(manager) => {
+            tracing::info!("Embedding manager initialized successfully");
+            tracing::info!("Using provider: {} (dimension: {})", manager.provider(), manager.dimension());
+            Some(Arc::new(manager))
         }
         Err(e) => {
-            warn!("Failed to initialize embedding service: {}. Vector features disabled.", e);
+            warn!("Failed to initialize embedding manager: {}. Vector features disabled.", e);
             None
         }
     };

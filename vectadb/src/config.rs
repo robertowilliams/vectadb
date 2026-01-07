@@ -43,6 +43,20 @@ pub struct QdrantConfig {
 pub struct EmbeddingConfig {
     pub model: String,
     pub dim: usize,
+    #[serde(default = "default_embedding_provider")]
+    pub provider: String,
+    #[serde(default = "default_plugin_config_dir")]
+    pub plugin_config_dir: String,
+    #[serde(default)]
+    pub fallback_to_local: bool,
+}
+
+fn default_embedding_provider() -> String {
+    "local".to_string()
+}
+
+fn default_plugin_config_dir() -> String {
+    "./config/embeddings".to_string()
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -97,6 +111,14 @@ impl Config {
                     .unwrap_or_else(|_| "384".to_string())
                     .parse()
                     .map_err(|e| VectaDBError::Config(format!("Invalid EMBEDDING_DIM: {}", e)))?,
+                provider: env::var("EMBEDDING_PROVIDER")
+                    .unwrap_or_else(|_| "local".to_string()),
+                plugin_config_dir: env::var("EMBEDDING_PLUGIN_CONFIG_DIR")
+                    .unwrap_or_else(|_| "./config/embeddings".to_string()),
+                fallback_to_local: env::var("EMBEDDING_FALLBACK_TO_LOCAL")
+                    .unwrap_or_else(|_| "false".to_string())
+                    .parse()
+                    .unwrap_or(false),
             },
             api: ApiConfig {
                 key: env::var("API_KEY")
