@@ -1,0 +1,17 @@
+services:
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    restart: always
+    ports:
+      - "9900:9000"   # S3 API
+      - "9901:9001"   # MinIO Console
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: Psalm121@ 
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+
+volumes:
+  minio_data:

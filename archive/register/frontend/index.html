@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Agent Registry Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- AWS Cloudscape Design System -->
+  <link rel="stylesheet" href="https://unpkg.com/@cloudscape-design/global-styles@1.0.26/index.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@cloudscape-design/design-tokens@3.0.38/index.css" />
+  <script src="https://unpkg.com/@cloudscape-design/components@3.0.632/index.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Amazon Ember", "Helvetica Neue", Roboto, Arial, sans-serif;
+      background-color: #f2f3f3;
+    }
+
+    #app-layout {
+      min-height: 100vh;
+    }
+
+    .custom-header {
+      background: #232f3e;
+      color: white;
+      padding: 0 20px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 1px 0 rgba(0,28,36,.3);
+    }
+
+    .custom-header-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .custom-header-logo {
+      width: 20px;
+      height: 20px;
+      background: #ff9900;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+      color: #232f3e;
+    }
+
+    .custom-header-user {
+      font-size: 13px;
+      color: #aab7b8;
+    }
+
+    .custom-header-user button {
+      background: transparent;
+      border: 1px solid #545b64;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 12px;
+      margin-left: 12px;
+    }
+
+    .custom-header-user button:hover {
+      background: #37475a;
+    }
+
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(to bottom, #232f3e, #1b2631);
+    }
+
+    .login-box {
+      background: white;
+      border-radius: 2px;
+      box-shadow: 0 1px 1px 0 rgba(0,28,36,.3), 1px 1px 1px 0 rgba(0,28,36,.15), -1px 1px 1px 0 rgba(0,28,36,.15);
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .login-logo {
+      width: 40px;
+      height: 40px;
+      background: #ff9900;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: bold;
+      color: #232f3e;
+      margin: 0 auto 24px;
+    }
+
+    .login-title {
+      font-size: 28px;
+      font-weight: 300;
+      color: #16191f;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .login-subtitle {
+      font-size: 14px;
+      color: #5f6b7a;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .form-field {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      color: #16191f;
+      margin-bottom: 4px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #aab7b8;
+      border-radius: 2px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #0972d3;
+      box-shadow: 0 0 0 1px #0972d3;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: #ec7211;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 2px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .btn-primary:hover {
+      background: #eb5f07;
+    }
+
+    .error-message {
+      color: #d13212;
+      font-size: 14px;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .content-layout {
+      padding: 20px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      margin-bottom: 20px;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 300;
+      color: #16191f;
+      margin: 0 0 4px 0;
+    }
+
+    .page-description {
+      font-size: 14px;
+      color: #5f6b7a;
+      margin: 0;
+    }
+
+    .container-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid #e9ebed;
+    }
+
+    .container-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #16191f;
+      margin: 0 0 4px 0;
+    }
+
+    .container-description {
+      font-size: 14px;
+      color: #5f6b7a;
+      margin: 0;
+    }
+
+    .container-content {
+      padding: 20px;
+    }
+
+    .aws-container {
+      background: white;
+      border: 1px solid #e9ebed;
+      border-radius: 2px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 1px 0 rgba(0,28,36,.3);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .form-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .form-input-small {
+      width: 100%;
+      padding: 6px 10px;
+      border: 1px solid #aab7b8;
+      border-radius: 2px;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+
+    .form-input-small:focus {
+      outline: none;
+      border-color: #0972d3;
+      box-shadow: 0 0 0 1px #0972d3;
+    }
+
+    .btn-small {
+      background: #ec7211;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 2px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-small:hover {
+      background: #eb5f07;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #16191f;
+      border: 1px solid #545b64;
+      padding: 6px 12px;
+      border-radius: 2px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      background: #fafafa;
+    }
+
+    .result-text {
+      font-size: 13px;
+      color: #037f0c;
+      margin-top: 8px;
+    }
+
+    .aws-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .aws-table thead {
+      background: #fafafa;
+      border-bottom: 2px solid #e9ebed;
+    }
+
+    .aws-table th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #16191f;
+    }
+
+    .aws-table td {
+      padding: 12px 16px;
+      font-size: 14px;
+      color: #16191f;
+      border-bottom: 1px solid #e9ebed;
+    }
+
+    .aws-table tbody tr:hover {
+      background: #fafafa;
+    }
+
+    .code-block {
+      background: #232f3e;
+      color: #d5dbdb;
+      padding: 16px;
+      border-radius: 2px;
+      font-family: Monaco, Menlo, Consolas, monospace;
+      font-size: 12px;
+      overflow-x: auto;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .graph-container {
+      background: #fafafa;
+      border: 1px solid #e9ebed;
+      border-radius: 2px;
+      height: 400px;
+      position: relative;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: #5f6b7a;
+      font-size: 14px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 2px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .badge-agent {
+      background: #e6f2ff;
+      color: #0972d3;
+    }
+
+    .badge-task {
+      background: #f2f8f0;
+      color: #037f0c;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Screen -->
+  <div id="loginSection" class="login-container">
+    <div class="login-box">
+      <div class="login-logo">AR</div>
+      <h1 class="login-title">Sign in</h1>
+      <p class="login-subtitle">Agent Registry Admin Console</p>
+
+      <form id="loginForm">
+        <div class="form-field">
+          <label class="form-label" for="username">Username</label>
+          <input id="username" name="username" type="text" autocomplete="username" class="form-input" placeholder="Enter username" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" class="form-input" placeholder="Enter password" />
+        </div>
+        <button type="submit" class="btn-primary">Sign in</button>
+      </form>
+
+      <p id="loginError" class="error-message"></p>
+
+      <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e9ebed; font-size: 13px; color: #5f6b7a; text-align: center;">
+        Demo credentials: <span style="font-family: monospace; color: #16191f;">admin / Psalm121@</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboardSection" class="hidden">
+    <!-- Top Navigation -->
+    <div class="custom-header">
+      <div class="custom-header-title">
+        <div class="custom-header-logo">AR</div>
+        <span>Agent Registry Admin</span>
+      </div>
+      <div class="custom-header-user">
+        <span id="userLabel"></span>
+        <button id="logoutBtn">Sign out</button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-layout">
+      <div class="page-header">
+        <h1 class="page-title">Agent Registry Dashboard</h1>
+        <p class="page-description">Manage and monitor agents, tasks, and system health</p>
+      </div>
+
+      <!-- System Health & Quick Actions -->
+      <div class="grid-3">
+        <!-- System Health -->
+        <div class="aws-container">
+          <div class="container-header">
+            <div>
+              <h2 class="container-title">System Health</h2>
+              <p class="container-description">Current system status and connectivity</p>
+            </div>
+            <button id="refreshHealthBtn" class="btn-secondary">Refresh</button>
+          </div>
+          <div class="container-content">
+            <pre id="healthOutput" class="code-block">Loading...</pre>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <!-- Create Agent -->
+          <div class="aws-container">
+            <div class="container-header">
+              <div>
+                <h2 class="container-title">Create Agent</h2>
+                <p class="container-description">Add new agent record</p>
+              </div>
+            </div>
+            <div class="container-content">
+              <form id="createAgentForm" class="form-container">
+                <input name="role" placeholder="Role (e.g. Researcher)" class="form-input-small" />
+                <input name="goal" placeholder="Goal" class="form-input-small" />
+                <input name="backstory" placeholder="Backstory" class="form-input-small" />
+                <input name="description" placeholder="Description" class="form-input-small" />
+                <button type="submit" class="btn-small">Create Agent</button>
+              </form>
+              <p id="createAgentResult" class="result-text"></p>
+            </div>
+          </div>
+
+          <!-- Create Task -->
+          <div class="aws-container">
+            <div class="container-header">
+              <div>
+                <h2 class="container-title">Create Task</h2>
+                <p class="container-description">Link task to agent</p>
+              </div>
+            </div>
+            <div class="container-content">
+              <form id="createTaskForm" class="form-container">
+                <input name="agent_id" placeholder="Agent ID (shortid)" class="form-input-small" />
+                <input name="role" placeholder="Role / type" class="form-input-small" />
+                <input name="goal" placeholder="Goal" class="form-input-small" />
+                <input name="description" placeholder="Description" class="form-input-small" />
+                <button type="submit" class="btn-small">Create Task</button>
+              </form>
+              <p id="createTaskResult" class="result-text"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agents & Tasks Tables -->
+      <div class="grid-2">
+        <!-- Agents Table -->
+        <div class="aws-container">
+          <div class="container-header">
+            <div>
+              <h2 class="container-title">Agents</h2>
+              <p class="container-description">Agents stored in CouchDB</p>
+            </div>
+            <button id="refreshAgentsBtn" class="btn-secondary">Refresh</button>
+          </div>
+          <div class="container-content" style="padding: 0;">
+            <div style="overflow-x: auto;">
+              <table class="aws-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Role</th>
+                    <th>Goal</th>
+                    <th>Description</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody id="agentsTableBody">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tasks Table -->
+        <div class="aws-container">
+          <div class="container-header">
+            <div>
+              <h2 class="container-title">Tasks</h2>
+              <p class="container-description">Tasks stored in CouchDB</p>
+            </div>
+            <button id="refreshTasksBtn" class="btn-secondary">Refresh</button>
+          </div>
+          <div class="container-content" style="padding: 0;">
+            <div style="overflow-x: auto;">
+              <table class="aws-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Agent ID</th>
+                    <th>Role / Type</th>
+                    <th>Goal</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody id="tasksTableBody">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graph View -->
+      <div class="aws-container">
+        <div class="container-header">
+          <div>
+            <h2 class="container-title">Graph Visualization</h2>
+            <p class="container-description">Force-directed layout showing Agent and Task relationships from Neo4j</p>
+          </div>
+          <button id="refreshGraphBtn" class="btn-secondary">Refresh Graph</button>
+        </div>
+        <div class="container-content">
+          <div id="graph" class="graph-container"></div>
+          <p style="margin-top: 12px; font-size: 13px; color: #5f6b7a;">
+            Drag nodes to pin them. Blue nodes are Agents, green nodes are Tasks.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const loginSection = document.getElementById("loginSection");
+    const dashboardSection = document.getElementById("dashboardSection");
+    const loginForm = document.getElementById("loginForm");
+    const loginError = document.getElementById("loginError");
+    const userLabel = document.getElementById("userLabel");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const healthOutput = document.getElementById("healthOutput");
+    const refreshHealthBtn = document.getElementById("refreshHealthBtn");
+    const createAgentForm = document.getElementById("createAgentForm");
+    const createAgentResult = document.getElementById("createAgentResult");
+    const createTaskForm = document.getElementById("createTaskForm");
+    const createTaskResult = document.getElementById("createTaskResult");
+    const refreshAgentsBtn = document.getElementById("refreshAgentsBtn");
+    const agentsTableBody = document.getElementById("agentsTableBody");
+    const refreshTasksBtn = document.getElementById("refreshTasksBtn");
+    const tasksTableBody = document.getElementById("tasksTableBody");
+    const refreshGraphBtn = document.getElementById("refreshGraphBtn");
+    const graphContainer = document.getElementById("graph");
+
+    function showLogin() {
+      loginSection.classList.remove("hidden");
+      dashboardSection.classList.add("hidden");
+      loginError.classList.remove("show");
+      loginError.textContent = "";
+    }
+
+    function showDashboard(username) {
+      loginSection.classList.add("hidden");
+      dashboardSection.classList.remove("hidden");
+      userLabel.textContent = username;
+      fetchHealth();
+      fetchAgents();
+      fetchTasks();
+      fetchGraph();
+    }
+
+    async function checkSession() {
+      try {
+        const res = await fetch("/auth/me", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          showDashboard(data.username);
+        } else {
+          showLogin();
+        }
+      } catch (e) {
+        console.error(e);
+        showLogin();
+      }
+    }
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      loginError.classList.remove("show");
+      loginError.textContent = "";
+
+      const formData = new FormData(loginForm);
+      const username = formData.get("username") || "";
+      const password = formData.get("password") || "";
+
+      try {
+        const res = await fetch("/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ username, password }),
+        });
+
+        if (!res.ok) {
+          loginError.textContent = "Invalid credentials. Please try again.";
+          loginError.classList.add("show");
+          return;
+        }
+
+        const data = await res.json();
+        showDashboard(data.username);
+      } catch (err) {
+        console.error(err);
+        loginError.textContent = "Login failed. Please check your connection and try again.";
+        loginError.classList.add("show");
+      }
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await fetch("/auth/logout", {
+          method: "POST",
+          credentials: "include",
+        });
+      } catch (e) {
+        console.error(e);
+      }
+      showLogin();
+    });
+
+    async function fetchHealth() {
+      healthOutput.textContent = "Loading...";
+      try {
+        const res = await fetch("/healthz", {
+          method: "GET",
+          credentials: "include",
+        });
+        const data = await res.json();
+        healthOutput.textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        console.error(e);
+        healthOutput.textContent = "Failed to load health information.";
+      }
+    }
+
+    refreshHealthBtn.addEventListener("click", fetchHealth);
+
+    async function fetchAgents() {
+      agentsTableBody.innerHTML = "";
+      try {
+        const res = await fetch("/ui/couch/agents?limit=100", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!res.ok) {
+          agentsTableBody.innerHTML = "<tr><td colspan='5' class='empty-state'>Failed to load agents.</td></tr>";
+          return;
+        }
+        const data = await res.json();
+        if (!data.items || data.items.length === 0) {
+          agentsTableBody.innerHTML = "<tr><td colspan='5' class='empty-state'>No agents yet. Create your first agent to get started.</td></tr>";
+          return;
+        }
+        for (const doc of data.items) {
+          const tr = document.createElement("tr");
+          const metadata = doc.metadata || {};
+          const createdAt = doc.created_at || doc._id || "";
+          const idVal = (doc.id || doc._id || "").toString();
+          const role = (metadata.role || "").toString();
+          const goal = (metadata.goal || "").toString();
+          const description = (metadata.description || "").toString();
+          tr.innerHTML = `
+            <td style="font-family: monospace; font-size: 12px;">${idVal}</td>
+            <td><span class="badge badge-agent">${role || 'N/A'}</span></td>
+            <td>${goal || 'N/A'}</td>
+            <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${description}">${description || 'N/A'}</td>
+            <td style="font-size: 12px; color: #5f6b7a;">${createdAt}</td>
+          `;
+          agentsTableBody.appendChild(tr);
+        }
+      } catch (e) {
+        console.error(e);
+        agentsTableBody.innerHTML = "<tr><td colspan='5' class='empty-state'>Error loading agents. Please try again.</td></tr>";
+      }
+    }
+
+    refreshAgentsBtn.addEventListener("click", fetchAgents);
+
+    async function fetchTasks() {
+      tasksTableBody.innerHTML = "";
+      try {
+        const res = await fetch("/ui/couch/tasks?limit=100", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!res.ok) {
+          tasksTableBody.innerHTML = "<tr><td colspan='5' class='empty-state'>Failed to load tasks.</td></tr>";
+          return;
+        }
+        const data = await res.json();
+        if (!data.items || data.items.length === 0) {
+          tasksTableBody.innerHTML = "<tr><td colspan='5' class='empty-state'>No tasks yet. Create your first task to get started.</td></tr>";
+          return;
+        }
+        for (const doc of data.items) {
+          const tr = document.createElement("tr");
+          const metadata = doc.metadata || {};
+          const createdAt = doc.created_at || doc._id || "";
+          const idVal = (doc.id || doc._id || "").toString();
+          const agentId = (doc.agent_id || "").toString();
+          const role = (metadata.role || "").toString();
+          const goal = (metadata.goal || "").toString();
+          tr.innerHTML = `
+            <td style="font-family: monospace; font-size: 12px;">${idVal}</td>
+            <td style="font-family: monospace; font-size: 12px;">${agentId}</td>
+            <td><span class="badge badge-task">${role || 'N/A'}</span></td>
+            <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${goal}">${goal || 'N/A'}</td>
+            <td style="font-size: 12px; color: #5f6b7a;">${createdAt}</td>
+          `;
+          tasksTableBody.appendChild(tr);
+        }
+      } catch (e) {
+        console.error(e);
+        tasksTableBody.innerHTML = "<tr><td colspan='5' class='empty-state'>Error loading tasks. Please try again.</td></tr>";
+      }
+    }
+
+    refreshTasksBtn.addEventListener("click", fetchTasks);
+
+    async function fetchGraph() {
+      if (!graphContainer) return;
+      graphContainer.innerHTML = "";
+      const loading = document.createElement("div");
+      loading.className = "empty-state";
+      loading.textContent = "Loading graph from Neo4j...";
+      graphContainer.appendChild(loading);
+
+      try {
+        const res = await fetch("/ui/graph?limit=200", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!res.ok) {
+          graphContainer.innerHTML = "<div class='empty-state' style='color: #d13212;'>Failed to load graph data.</div>";
+          return;
+        }
+        const data = await res.json();
+        renderGraph(data);
+      } catch (e) {
+        console.error(e);
+        graphContainer.innerHTML = "<div class='empty-state' style='color: #d13212;'>Error loading graph. Please try again.</div>";
+      }
+    }
+
+    function renderGraph(data) {
+      if (!graphContainer) return;
+      graphContainer.innerHTML = "";
+
+      const nodes = (data && data.nodes) ? data.nodes.slice() : [];
+      const links = (data && (data.edges || data.links)) ? data.edges || data.links : [];
+
+      if (nodes.length === 0) {
+        graphContainer.innerHTML = "<div class='empty-state'>No graph data available. Create some agents and tasks to see them here.</div>";
+        return;
+      }
+
+      const rect = graphContainer.getBoundingClientRect();
+      const width = rect.width || 600;
+      const height = rect.height || 400;
+
+      const svg = d3.select(graphContainer)
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .style("background", "#fafafa");
+
+      const g = svg.append("g");
+
+      const zoom = d3.zoom()
+        .scaleExtent([0.3, 3])
+        .on("zoom", (event) => {
+          g.attr("transform", event.transform);
+        });
+
+      svg.call(zoom);
+
+      const link = g.append("g")
+        .attr("stroke", "#aab7b8")
+        .attr("stroke-opacity", 0.6)
+        .selectAll("line")
+        .data(links)
+        .join("line")
+        .attr("stroke-width", 2);
+
+      const node = g.append("g")
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 2)
+        .selectAll("circle")
+        .data(nodes)
+        .join("circle")
+        .attr("r", d => d.label === "Agent" ? 12 : 8)
+        .attr("fill", d => d.label === "Agent" ? "#0972d3" : "#037f0c");
+
+      const labels = g.append("g")
+        .selectAll("text")
+        .data(nodes)
+        .join("text")
+        .attr("font-size", 11)
+        .attr("font-weight", "700")
+        .attr("fill", "#16191f")
+        .attr("stroke", "none")
+        .attr("text-anchor", "middle")
+        .text(d => d.label === "Agent" ? (d.shortid || "Agent") : (d.shortid || "Task"));
+
+      node.append("title")
+        .text(d => `${d.label}: ${d.shortid || d.id}`);
+
+      const simulation = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(links).id(d => d.id).distance(80))
+        .force("charge", d3.forceManyBody().strength(-200))
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("collide", d3.forceCollide().radius(d => d.label === "Agent" ? 15 : 12));
+
+      node.call(drag(simulation));
+
+      simulation.on("tick", () => {
+        link
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+
+        node
+          .attr("cx", d => d.x)
+          .attr("cy", d => d.y);
+
+        labels
+          .attr("x", d => d.x)
+          .attr("y", d => d.y - 16);
+      });
+
+      function drag(simulation) {
+        function dragstarted(event, d) {
+          if (!event.active) simulation.alphaTarget(0.3).restart();
+          d.fx = d.x;
+          d.fy = d.y;
+        }
+
+        function dragged(event, d) {
+          d.fx = event.x;
+          d.fy = event.y;
+        }
+
+        function dragended(event, d) {
+          if (!event.active) simulation.alphaTarget(0);
+        }
+
+        return d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended);
+      }
+    }
+
+    refreshGraphBtn.addEventListener("click", fetchGraph);
+
+    createAgentForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      createAgentResult.textContent = "";
+      const formData = new FormData(createAgentForm);
+      const metadata = {
+        role: formData.get("role") || "",
+        goal: formData.get("goal") || "",
+        backstory: formData.get("backstory") || "",
+        description: formData.get("description") || "",
+      };
+
+      try {
+        const body = {
+          method: "create_id",
+          params: { metadata },
+          id: "ui",
+        };
+        const res = await fetch("/ui/agents", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) {
+          createAgentResult.textContent = "Failed to create agent.";
+          createAgentResult.style.color = "#d13212";
+          return;
+        }
+        const data = await res.json();
+        const newId = (data.result && data.result.id) || "unknown";
+        createAgentResult.textContent = "✓ Created agent ID: " + newId;
+        createAgentResult.style.color = "#037f0c";
+        createAgentForm.reset();
+        fetchAgents();
+      } catch (e) {
+        console.error(e);
+        createAgentResult.textContent = "Error creating agent.";
+        createAgentResult.style.color = "#d13212";
+      }
+    });
+
+    createTaskForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      createTaskResult.textContent = "";
+      const formData = new FormData(createTaskForm);
+      const agent_id = (formData.get("agent_id") || "").toString().trim();
+      const metadata = {
+        role: formData.get("role") || "",
+        goal: formData.get("goal") || "",
+        description: formData.get("description") || "",
+      };
+
+      if (!agent_id) {
+        createTaskResult.textContent = "Agent ID is required.";
+        createTaskResult.style.color = "#d13212";
+        return;
+      }
+
+      try {
+        const body = {
+          method: "create_id",
+          params: { agent_id, metadata },
+          id: "ui-task",
+        };
+        const res = await fetch("/ui/tasks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (!res.ok || data.error) {
+          const message =
+            (data.error && data.error.message) ||
+            "Failed to create task.";
+          createTaskResult.textContent = message;
+          createTaskResult.style.color = "#d13212";
+          return;
+        }
+        const newId = (data.result && data.result.id) || "unknown";
+        createTaskResult.textContent = "✓ Created task ID: " + newId;
+        createTaskResult.style.color = "#037f0c";
+        createTaskForm.reset();
+        fetchTasks();
+      } catch (e) {
+        console.error(e);
+        createTaskResult.textContent = "Error creating task.";
+        createTaskResult.style.color = "#d13212";
+      }
+    });
+
+    // Initialize
+    checkSession();
+  </script>
+</body>
+</html>

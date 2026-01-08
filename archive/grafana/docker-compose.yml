@@ -1,0 +1,26 @@
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=16vbqWG5tpGfgbK8cICxUVvp
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - grafana_data:/var/lib/grafana
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    external: true
+
+volumes:
+  grafana_data:
+
+

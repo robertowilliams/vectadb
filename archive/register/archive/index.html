@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Agent Registry Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <div class="min-h-screen flex flex-col">
+    <!-- Top Bar -->
+    <header class="border-b border-slate-800 bg-slate-900/70 backdrop-blur">
+      <div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="h-8 w-8 rounded-xl bg-indigo-500 flex items-center justify-center text-xs font-bold">
+            AR
+          </div>
+          <div>
+            <h1 class="text-lg font-semibold">Agent Registry Admin</h1>
+            <p class="text-xs text-slate-400">CouchDB · Chroma · Neo4j</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="userLabel" class="text-sm text-slate-400 hidden"></span>
+          <button id="logoutBtn" class="hidden px-3 py-1.5 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700">
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="flex-1 mx-auto max-w-6xl w-full px-4 py-6">
+      <!-- Login Card -->
+      <section id="loginSection" class="flex justify-center items-center min-h-[60vh]">
+        <div class="w-full max-w-sm bg-slate-900/70 border border-slate-800 rounded-2xl p-6 shadow-xl shadow-black/40">
+          <h2 class="text-xl font-semibold mb-1">Sign in</h2>
+          <p class="text-sm text-slate-400 mb-4">Use <span class="font-mono text-slate-200">admin / admin</span> (demo only).</p>
+
+          <form id="loginForm" class="space-y-3">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1" for="username">Username</label>
+              <input id="username" name="username" type="text" autocomplete="username"
+                     class="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1" for="password">Password</label>
+              <input id="password" name="password" type="password" autocomplete="current-password"
+                     class="w-full rounded-lg bg-slate-900 border border-slate-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+            <button type="submit"
+                    class="w-full mt-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 px-3 py-2 text-sm font-medium">
+              Sign in
+            </button>
+          </form>
+
+          <p id="loginError" class="mt-3 text-xs text-red-400 hidden"></p>
+        </div>
+      </section>
+
+      <!-- Dashboard -->
+      <section id="dashboardSection" class="hidden space-y-6">
+        <!-- Status + Create Forms -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Health -->
+          <div class="col-span-1 md:col-span-2 bg-slate-900/70 border border-slate-800 rounded-2xl p-4">
+            <div class="flex items-center justify-between mb-2">
+              <h2 class="text-sm font-semibold text-slate-100">System Health</h2>
+              <button id="refreshHealthBtn"
+                      class="px-3 py-1.5 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700">
+                Refresh
+              </button>
+            </div>
+            <pre id="healthOutput" class="text-xs text-slate-300 bg-slate-950/70 rounded-lg p-3 overflow-x-auto max-h-40"></pre>
+          </div>
+
+          <!-- Create Agent / Task -->
+          <div class="space-y-4">
+            <!-- Create Agent -->
+            <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 space-y-3">
+              <div>
+                <h2 class="text-sm font-semibold text-slate-100 mb-1">Create Agent</h2>
+                <p class="text-xs text-slate-400">Quickly spin up a new agent record.</p>
+              </div>
+              <form id="createAgentForm" class="space-y-2">
+                <input name="role" placeholder="Role (e.g. Researcher)" class="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-1.5 text-xs" />
+                <input name="goal" placeholder="Goal" class="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-1.5 text-xs" />
+                <input name="backstory" placeholder="Backstory" class="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-1.5 text-xs" />
+                <input name="description" placeholder="Description" class="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-1.5 text-xs" />
+                <button type="submit"
+                        class="w-full mt-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 px-3 py-1.5 text-xs font-medium">
+                  Create Agent
+                </button>
+              </form>
+              <p id="createAgentResult" class="text-xs text-slate-300"></p>
+            </div>
+
+            <!-- Create Task -->
+            <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 space-y-3">
+              <div>
+                <h2 class="text-sm font-semibold text-slate-100 mb-1">Create Task</h2>
+                <p class="text-xs text-slate-400">
+                  Link a task to an existing agent (Neo4j must contain the agent).
+                </p>
+              </div>
+              <form id="createTaskForm" class="space-y-2">
+                <input name="agent_id" placeholder="Agent ID (shortid)" class="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-1.5 text-xs" />
+                <input name="role" placeholder="Role / type" class="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-1.5 text-xs" />
+                <input name="goal" placeholder="Goal" class="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-1.5 text-xs" />
+                <input name="description" placeholder="Description" class="w-full rounded-lg bg-slate-950 border border-slate-800 px-3 py-1.5 text-xs" />
+                <button type="submit"
+                        class="w-full mt-1 rounded-lg bg-sky-600 hover:bg-sky-500 px-3 py-1.5 text-xs font-medium">
+                  Create Task
+                </button>
+              </form>
+              <p id="createTaskResult" class="text-xs text-slate-300"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Agents + Tasks Tables -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <!-- Agents Table -->
+          <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h2 class="text-sm font-semibold text-slate-100">Agents</h2>
+                <p class="text-xs text-slate-400">Listing from CouchDB (UI proxy).</p>
+              </div>
+              <button id="refreshAgentsBtn"
+                      class="px-3 py-1.5 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700">
+                Refresh
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-xs border-collapse">
+                <thead class="bg-slate-950/80">
+                  <tr>
+                    <th class="px-3 py-2 text-left font-medium text-slate-300 border-b border-slate-800">ID</th>
+                    <th class="px-3 py-2 text-left font-medium text-slate-300 border-b border-slate-800">Role</th>
+                    <th class="px-3 py-2 text-left font-medium text-slate-300 border-b border-slate-800">Goal</th>
+                    <th class="px-3 py-2 text-left font-medium text-slate-300 border-b border-slate-800">Description</th>
+                    <th class="px-3 py-2 text-left font-medium text-slate-300 border-b border-slate-800">Created</th>
+                  </tr>
+                </thead>
+                <tbody id="agentsTableBody" class="divide-y divide-slate-800">
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tasks Table -->
+          <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h2 class="text-sm font-semibold text-slate-100">Tasks</h2>
+                <p class="text-xs text-slate-400">Listing from CouchDB (UI proxy).</p>
+              </div>
+              <button id="refreshTasksBtn"
+                      class="px-3 py-1.5 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700">
+                Refresh
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-xs border-collapse">
+                <thead class="bg-slate-950/80">
+                  <tr>
+                    <th class="px-3 py-2 text-left font-medium text-slate-300 border-b border-slate-800">ID</th>
+                    <th class="px-3 py-2 text-left font-medium text-slate-300 border-b border-slate-800">Agent ID</th>
+                    <th class="px-3 py-2 text-left font-medium text-slate-300 border-b border-slate-800">Role / Type</th>
+                    <th class="px-3 py-2 text-left font-medium text-slate-300 border-b border-slate-800">Goal</th>
+                    <th class="px-3 py-2 text-left font-medium text-slate-300 border-b border-slate-800">Created</th>
+                  </tr>
+                </thead>
+                <tbody id="tasksTableBody" class="divide-y divide-slate-800">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Graph View -->
+        <div class="mt-4 bg-slate-900/70 border border-slate-800 rounded-2xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h2 class="text-sm font-semibold text-slate-100">Neo4j Graph</h2>
+              <p class="text-xs text-slate-400">
+                Force-directed layout of Agents and Tasks (BELONGS_TO edges).
+              </p>
+            </div>
+            <button id="refreshGraphBtn"
+                    class="px-3 py-1.5 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700">
+              Refresh Graph
+            </button>
+          </div>
+          <div id="graph" class="w-full h-80 bg-slate-950 rounded-xl border border-slate-800 overflow-hidden"></div>
+          <p class="mt-2 text-xs text-slate-500">
+            Drag nodes to pin them. Larger purple nodes are Agents, blue nodes are Tasks.
+          </p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const loginSection = document.getElementById("loginSection");
+    const dashboardSection = document.getElementById("dashboardSection");
+    const loginForm = document.getElementById("loginForm");
+    const loginError = document.getElementById("loginError");
+    const userLabel = document.getElementById("userLabel");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const healthOutput = document.getElementById("healthOutput");
+    const refreshHealthBtn = document.getElementById("refreshHealthBtn");
+    const createAgentForm = document.getElementById("createAgentForm");
+    const createAgentResult = document.getElementById("createAgentResult");
+    const createTaskForm = document.getElementById("createTaskForm");
+    const createTaskResult = document.getElementById("createTaskResult");
+    const refreshAgentsBtn = document.getElementById("refreshAgentsBtn");
+    const agentsTableBody = document.getElementById("agentsTableBody");
+    const refreshTasksBtn = document.getElementById("refreshTasksBtn");
+    const tasksTableBody = document.getElementById("tasksTableBody");
+    const refreshGraphBtn = document.getElementById("refreshGraphBtn");
+    const graphContainer = document.getElementById("graph");
+
+    function showLogin() {
+      loginSection.classList.remove("hidden");
+      dashboardSection.classList.add("hidden");
+      logoutBtn.classList.add("hidden");
+      userLabel.classList.add("hidden");
+      loginError.classList.add("hidden");
+      loginError.textContent = "";
+    }
+
+    function showDashboard(username) {
+      loginSection.classList.add("hidden");
+      dashboardSection.classList.remove("hidden");
+      logoutBtn.classList.remove("hidden");
+      userLabel.classList.remove("hidden");
+      userLabel.textContent = "Logged in as " + username;
+      fetchHealth();
+      fetchAgents();
+      fetchTasks();
+      fetchGraph();
+    }
+
+    async function checkSession() {
+      try {
+        const res = await fetch("/auth/me", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          showDashboard(data.username);
+        } else {
+          showLogin();
+        }
+      } catch (e) {
+        console.error(e);
+        showLogin();
+      }
+    }
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      loginError.classList.add("hidden");
+      loginError.textContent = "";
+
+      const formData = new FormData(loginForm);
+      const username = formData.get("username") || "";
+      const password = formData.get("password") || "";
+
+      try {
+        const res = await fetch("/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ username, password }),
+        });
+
+        if (!res.ok) {
+          loginError.textContent = "Invalid credentials.";
+          loginError.classList.remove("hidden");
+          return;
+        }
+
+        const data = await res.json();
+        showDashboard(data.username);
+      } catch (err) {
+        console.error(err);
+        loginError.textContent = "Login failed. See console for details.";
+        loginError.classList.remove("hidden");
+      }
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await fetch("/auth/logout", {
+          method: "POST",
+          credentials: "include",
+        });
+      } catch (e) {
+        console.error(e);
+      }
+      showLogin();
+    });
+
+    async function fetchHealth() {
+      healthOutput.textContent = "Loading...";
+      try {
+        const res = await fetch("/healthz", {
+          method: "GET",
+          credentials: "include",
+        });
+        const data = await res.json();
+        healthOutput.textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        console.error(e);
+        healthOutput.textContent = "Failed to load health info.";
+      }
+    }
+
+    refreshHealthBtn.addEventListener("click", fetchHealth);
+
+    async function fetchAgents() {
+      agentsTableBody.innerHTML = "";
+      try {
+        const res = await fetch("/ui/couch/agents?limit=100", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!res.ok) {
+          agentsTableBody.innerHTML = "<tr><td colspan='5' class='px-3 py-3 text-center text-slate-400'>Failed to load agents.</td></tr>";
+          return;
+        }
+        const data = await res.json();
+        if (!data.items || data.items.length === 0) {
+          agentsTableBody.innerHTML = "<tr><td colspan='5' class='px-3 py-3 text-center text-slate-400'>No agents yet.</td></tr>";
+          return;
+        }
+        for (const doc of data.items) {
+          const tr = document.createElement("tr");
+          const metadata = doc.metadata || {};
+          const createdAt = doc.created_at || doc._id || "";
+          const idVal = (doc.id || doc._id || "").toString();
+          const role = (metadata.role || "").toString();
+          const goal = (metadata.goal || "").toString();
+          const description = (metadata.description || "").toString();
+          tr.innerHTML = `
+            <td class="px-3 py-2 font-mono text-[11px] text-slate-200">${idVal}</td>
+            <td class="px-3 py-2 text-slate-200">${role}</td>
+            <td class="px-3 py-2 text-slate-200">${goal}</td>
+            <td class="px-3 py-2 text-slate-200 max-w-xs truncate" title="${description}">${description}</td>
+            <td class="px-3 py-2 text-slate-400 text-[11px]">${createdAt}</td>
+          `;
+          agentsTableBody.appendChild(tr);
+        }
+      } catch (e) {
+        console.error(e);
+        agentsTableBody.innerHTML = "<tr><td colspan='5' class='px-3 py-3 text-center text-slate-400'>Error loading agents.</td></tr>";
+      }
+    }
+
+    refreshAgentsBtn.addEventListener("click", fetchAgents);
+
+    async function fetchTasks() {
+      tasksTableBody.innerHTML = "";
+      try {
+        const res = await fetch("/ui/couch/tasks?limit=100", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!res.ok) {
+          tasksTableBody.innerHTML = "<tr><td colspan='5' class='px-3 py-3 text-center text-slate-400'>Failed to load tasks.</td></tr>";
+          return;
+        }
+        const data = await res.json();
+        if (!data.items || data.items.length === 0) {
+          tasksTableBody.innerHTML = "<tr><td colspan='5' class='px-3 py-3 text-center text-slate-400'>No tasks yet.</td></tr>";
+          return;
+        }
+        for (const doc of data.items) {
+          const tr = document.createElement("tr");
+          const metadata = doc.metadata || {};
+          const createdAt = doc.created_at || doc._id || "";
+          const idVal = (doc.id || doc._id || "").toString();
+          const agentId = (doc.agent_id || "").toString();
+          const role = (metadata.role || "").toString();
+          const goal = (metadata.goal || "").toString();
+          tr.innerHTML = `
+            <td class="px-3 py-2 font-mono text-[11px] text-slate-200">${idVal}</td>
+            <td class="px-3 py-2 font-mono text-[11px] text-slate-300">${agentId}</td>
+            <td class="px-3 py-2 text-slate-200">${role}</td>
+            <td class="px-3 py-2 text-slate-200 max-w-xs truncate" title="${goal}">${goal}</td>
+            <td class="px-3 py-2 text-slate-400 text-[11px]">${createdAt}</td>
+          `;
+          tasksTableBody.appendChild(tr);
+        }
+      } catch (e) {
+        console.error(e);
+        tasksTableBody.innerHTML = "<tr><td colspan='5' class='px-3 py-3 text-center text-slate-400'>Error loading tasks.</td></tr>";
+      }
+    }
+
+    refreshTasksBtn.addEventListener("click", fetchTasks);
+
+    async function fetchGraph() {
+      if (!graphContainer) return;
+      graphContainer.innerHTML = "";
+      const loading = document.createElement("div");
+      loading.className = "w-full h-full flex items-center justify-center text-xs text-slate-400";
+      loading.textContent = "Loading graph from Neo4j...";
+      graphContainer.appendChild(loading);
+
+      try {
+        const res = await fetch("/ui/graph?limit=200", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!res.ok) {
+          graphContainer.innerHTML = "<div class='w-full h-full flex items-center justify-center text-xs text-red-400'>Failed to load graph.</div>";
+          return;
+        }
+        const data = await res.json();
+        renderGraph(data);
+      } catch (e) {
+        console.error(e);
+        graphContainer.innerHTML = "<div class='w-full h-full flex items-center justify-center text-xs text-red-400'>Error loading graph.</div>";
+      }
+    }
+
+    function renderGraph(data) {
+      if (!graphContainer) return;
+      graphContainer.innerHTML = "";
+
+      const nodes = (data && data.nodes) ? data.nodes.slice() : [];
+      const links = (data && (data.edges || data.links)) ? data.edges || data.links : [];
+
+      if (nodes.length === 0) {
+        graphContainer.innerHTML = "<div class='w-full h-full flex items-center justify-center text-xs text-slate-400'>No nodes yet. Create some agents and tasks first.</div>";
+        return;
+      }
+
+      const rect = graphContainer.getBoundingClientRect();
+      const width = rect.width || 600;
+      const height = rect.height || 320;
+
+      const svg = d3.select(graphContainer)
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+      const g = svg.append("g");
+
+      const zoom = d3.zoom()
+        .scaleExtent([0.3, 3])
+        .on("zoom", (event) => {
+          g.attr("transform", event.transform);
+        });
+
+      svg.call(zoom);
+
+      const link = g.append("g")
+        .attr("stroke", "#64748b")
+        .attr("stroke-opacity", 0.6)
+        .selectAll("line")
+        .data(links)
+        .join("line")
+        .attr("stroke-width", 1);
+
+      const node = g.append("g")
+        .attr("stroke", "#0f172a")
+        .attr("stroke-width", 1.5)
+        .selectAll("circle")
+        .data(nodes)
+        .join("circle")
+        .attr("r", d => d.label === "Agent" ? 10 : 7)
+        .attr("fill", d => d.label === "Agent" ? "#4f46e5" : "#0ea5e9");
+
+      const labels = g.append("g")
+        .selectAll("text")
+        .data(nodes)
+        .join("text")
+        .attr("font-size", 9)
+        .attr("fill", "#e2e8f0")
+        .attr("stroke", "none")
+        .attr("text-anchor", "middle")
+        .text(d => d.label === "Agent" ? (d.shortid || "Agent") : (d.shortid || "Task"));
+
+      node.append("title")
+        .text(d => `${d.label}: ${d.shortid || d.id}`);
+
+      const simulation = d3.forceSimulation(nodes)
+        // shorter link distance = nodes closer
+        .force("link", d3.forceLink(links).id(d => d.id).distance(50))
+        // less repulsion (less negative) = tighter clusters
+        .force("charge", d3.forceManyBody().strength(-120))
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        // smaller collision radius = nodes can pack more tightly
+        .force("collide", d3.forceCollide().radius(d => d.label === "Agent" ? 10 : 8));
+
+
+      node.call(drag(simulation));
+
+      simulation.on("tick", () => {
+        link
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+
+        node
+          .attr("cx", d => d.x)
+          .attr("cy", d => d.y);
+
+        labels
+          .attr("x", d => d.x)
+          .attr("y", d => d.y - 12);
+      });
+
+      function drag(simulation) {
+        function dragstarted(event, d) {
+          if (!event.active) simulation.alphaTarget(0.3).restart();
+          d.fx = d.x;
+          d.fy = d.y;
+        }
+
+        function dragged(event, d) {
+          d.fx = event.x;
+          d.fy = event.y;
+        }
+
+        function dragended(event, d) {
+          if (!event.active) simulation.alphaTarget(0);
+          // keep node pinned where user left it
+        }
+
+        return d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended);
+      }
+    }
+
+    refreshTasksBtn.addEventListener("click", fetchTasks);
+    refreshGraphBtn.addEventListener("click", fetchGraph);
+
+    createAgentForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      createAgentResult.textContent = "";
+      const formData = new FormData(createAgentForm);
+      const metadata = {
+        role: formData.get("role") || "",
+        goal: formData.get("goal") || "",
+        backstory: formData.get("backstory") || "",
+        description: formData.get("description") || "",
+      };
+
+      try {
+        const body = {
+          method: "create_id",
+          params: { metadata },
+          id: "ui",
+        };
+        const res = await fetch("/ui/agents", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) {
+          createAgentResult.textContent = "Failed to create agent.";
+          return;
+        }
+        const data = await res.json();
+        const newId = (data.result && data.result.id) || "unknown";
+        createAgentResult.textContent = "Created agent ID: " + newId;
+        createAgentForm.reset();
+        fetchAgents();
+      } catch (e) {
+        console.error(e);
+        createAgentResult.textContent = "Error creating agent.";
+      }
+    });
+
+    createTaskForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      createTaskResult.textContent = "";
+      const formData = new FormData(createTaskForm);
+      const agent_id = (formData.get("agent_id") || "").toString().trim();
+      const metadata = {
+        role: formData.get("role") || "",
+        goal: formData.get("goal") || "",
+        description: formData.get("description") || "",
+      };
+
+      if (!agent_id) {
+        createTaskResult.textContent = "Agent ID is required.";
+        return;
+      }
+
+      try {
+        const body = {
+          method: "create_id",
+          params: { agent_id, metadata },
+          id: "ui-task",
+        };
+        const res = await fetch("/ui/tasks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (!res.ok || data.error) {
+          const message =
+            (data.error && data.error.message) ||
+            "Failed to create task.";
+          createTaskResult.textContent = message;
+          return;
+        }
+        const newId = (data.result && data.result.id) || "unknown";
+        createTaskResult.textContent = "Created task ID: " + newId;
+        createTaskForm.reset();
+        fetchTasks();
+      } catch (e) {
+        console.error(e);
+        createTaskResult.textContent = "Error creating task.";
+      }
+    });
+
+    // init
+    checkSession();
+  </script>
+</body>
+</html>

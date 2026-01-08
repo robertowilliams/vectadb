@@ -1,0 +1,17 @@
+[project]
+name = "shortid"
+version = "0.1.0"
+description = "JSON-RPC service for generating and storing short unique IDs"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pymongo",
+    "python-dotenv",
+    "pyyaml",
+    "weaviate-client>=4.0.0",
+]
+
+[tool.uv]
+required-version = ">=0.8.0"

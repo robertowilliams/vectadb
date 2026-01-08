@@ -1,0 +1,28 @@
+Agent Registry Report
+Generated at: 2025-11-24 19:22:18 UTC
+============================================================
+
+HEALTH STATUS
+------------------------------------------------------------
+Overall status: ok
+
+couchdb         : ✅ OK
+chroma          : ✅ OK
+neo4j           : ✅ OK
+embedding_model : ✅ OK
+
+COUCHDB OBJECTS
+------------------------------------------------------------
+Agents count: 0
+Tasks count : 0
+
+RAW JSON SNAPSHOT (truncated)
+------------------------------------------------------------
+Health:
+{"status": "ok", "couchdb": true, "chroma": true, "chroma_heartbeat": 1764012138482226000, "embedding_model": true, "neo4j": true}
+
+Agents (first 3 docs):
+[]
+
+Tasks (first 3 docs):
+[]

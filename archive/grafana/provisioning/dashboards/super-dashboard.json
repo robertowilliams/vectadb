@@ -1,0 +1,221 @@
+{
+  "id": null,
+  "uid": "super-dashboard",
+  "title": "🚀 Agent Observatory & Anomaly Intelligence Suite",
+  "tags": ["agents", "ai", "audit", "anomaly", "crew", "neo4j", "weaviate"],
+  "timezone": "browser",
+  "schemaVersion": 36,
+  "version": 1,
+  "refresh": "5s",
+  "templating": {
+    "list": [
+      {
+        "name": "agent_id",
+        "type": "query",
+        "datasource": "Prometheus",
+        "refresh": 1,
+        "query": "label_values(agent_logs_total, agent)",
+        "sort": 1
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "row",
+      "title": "🔥 Agent Overview",
+      "collapsed": false,
+      "id": 100,
+      "panels": []
+    },
+    {
+      "type": "stat",
+      "title": "Total Logs",
+      "id": 1,
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "targets": [
+        { "expr": "sum(agent_logs_total{agent=\"$agent_id\"})" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Error Logs",
+      "id": 2,
+      "colorMode": "value",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "targets": [
+        { "expr": "sum(agent_errors_total{agent=\"$agent_id\"})" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Z-Score (Statistical Anomaly)",
+      "id": 3,
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "targets": [
+        { "expr": "agent_anomaly_score{agent=\"$agent_id\"}" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Semantic Drift",
+      "id": 4,
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "targets": [
+        { "expr": "agent_semantic_anomaly_distance{agent=\"$agent_id\"}" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Graph Error Cycles (Neo4J)",
+      "id": 5,
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "targets": [
+        { "expr": "agent_graph_error_cycles{agent=\"$agent_id\"}" }
+      ]
+    },
+
+    {
+      "type": "row",
+      "title": "📈 Activity & Error Behavior",
+      "collapsed": false,
+      "id": 200,
+      "panels": []
+    },
+    {
+      "type": "graph",
+      "title": "Logs Per Minute",
+      "id": 6,
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 5 },
+      "targets": [
+        {
+          "expr": "rate(agent_logs_total{agent=\"$agent_id\"}[1m])",
+          "legendFormat": "logs/min"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Errors Per Minute",
+      "id": 7,
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 5 },
+      "targets": [
+        {
+          "expr": "rate(agent_errors_total{agent=\"$agent_id\"}[1m])",
+          "legendFormat": "errors/min"
+        }
+      ]
+    },
+
+    {
+      "type": "row",
+      "title": "🧠 Reasoning Intelligence",
+      "collapsed": false,
+      "id": 300,
+      "panels": []
+    },
+    {
+      "type": "graph",
+      "title": "Chain-of-Thought Length",
+      "id": 8,
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 11 },
+      "targets": [
+        {
+          "expr": "rate(agent_chain_of_thought_length_sum{agent=\"$agent_id\"}[5m])",
+          "legendFormat": "thought length"
+        }
+      ]
+    },
+
+    {
+      "type": "row",
+      "title": "⚙️ Agent Runtime & Performance",
+      "collapsed": false,
+      "id": 400,
+      "panels": []
+    },
+    {
+      "type": "graph",
+      "title": "Execution Runtime (seconds)",
+      "id": 10,
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 18 },
+      "targets": [
+        {
+          "expr": "rate(agent_runtime_seconds_sum{agent=\"$agent_id\"}[5m])",
+          "legendFormat": "runtime"
+        }
+      ]
+    },
+
+    {
+      "type": "row",
+      "title": "🔧 Tool Reliability",
+      "collapsed": false,
+      "id": 500,
+      "panels": []
+    },
+    {
+      "type": "table",
+      "title": "Tool Failure Counts",
+      "id": 12,
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 25 },
+      "targets": [
+        {
+          "expr": "tool_failure_total{agent=\"$agent_id\"}",
+          "legendFormat": "{{tool}}"
+        }
+      ]
+    },
+
+    {
+      "type": "row",
+      "title": "🧪 Anomaly Intelligence",
+      "collapsed": false,
+      "id": 600,
+      "panels": []
+    },
+    {
+      "type": "graph",
+      "title": "Semantic Drift Over Time",
+      "id": 14,
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 32 },
+      "targets": [
+        {
+          "expr": "agent_semantic_anomaly_distance{agent=\"$agent_id\"}",
+          "legendFormat": "drift"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Z-Score Anomaly Over Time",
+      "id": 15,
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 38 },
+      "targets": [
+        {
+          "expr": "agent_anomaly_score{agent=\"$agent_id\"}",
+          "legendFormat": "z"
+        }
+      ]
+    },
+
+    {
+      "type": "row",
+      "title": "🔥 Latency & Log Ingestion",
+      "collapsed": false,
+      "id": 700,
+      "panels": []
+    },
+    {
+      "type": "graph",
+      "title": "Log Ingestion Latency (seconds)",
+      "id": 16,
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 44 },
+      "targets": [
+        {
+          "expr": "rate(agent_log_latency_seconds_sum{agent=\"$agent_id\"}[5m])",
+          "legendFormat": "ingestion latency"
+        }
+      ]
+    }
+  ]
+}

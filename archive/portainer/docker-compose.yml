@@ -1,0 +1,15 @@
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    platform: linux/arm64
+    container_name: portainer
+    restart: always
+    ports:
+      - 9000:9000
+      - 9443:9443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer-data:/data
+
+volumes:
+  portainer-data:

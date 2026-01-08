@@ -1,0 +1,7 @@
+main *.py 
+.*
+*.lock
+*.json
+notes
+.archive
+.vscode

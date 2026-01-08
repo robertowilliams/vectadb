@@ -1,0 +1,167 @@
+[
+  {
+    "record": {
+      "id": "HtgZLH",
+      "created_at": "2025-11-21T04:51:47.328679",
+      "metadata": {
+        "role": "Linux security log auditor",
+        "goal": "Detect anomalies in Ubuntu logs",
+        "backstory": "SRE with deep security experience",
+        "description": "Scans syslog and auth.log",
+        "expected_output": "JSON anomaly report"
+      },
+      "type": "agents",
+      "_id": "ac16f08a0fedc77050e1d05ca9006dcc",
+      "_rev": "1-3e44cb244aba658f228d57497a9d5dfe"
+    },
+    "collection": "AgentMetadata"
+  },
+  {
+    "record": {
+      "id": "er4kFp",
+      "created_at": "2025-11-21T04:51:47.350880",
+      "metadata": {
+        "role": "Daily security check",
+        "description": "Scan logs for anomalies every 24 hours",
+        "expected_output": "Daily anomaly summary"
+      },
+      "type": "tasks",
+      "agent_id": "HtgZLH",
+      "_id": "ac16f08a0fedc77050e1d05ca9007559",
+      "_rev": "1-c3348370bd2c8570c892171fa47809d5"
+    },
+    "collection": "TaskMetadata"
+  },
+  {
+    "record": {
+      "id": "CM4fPo",
+      "created_at": "2025-11-21T04:53:01.530502",
+      "metadata": {
+        "role": "Linux security log auditor",
+        "goal": "Detect anomalies in Ubuntu logs",
+        "backstory": "SRE with deep security experience",
+        "description": "Scans syslog and auth.log",
+        "expected_output": "JSON anomaly report"
+      },
+      "type": "agents",
+      "_id": "ac16f08a0fedc77050e1d05ca900851d",
+      "_rev": "1-2a1996998ae3634dd589d8e6f1cf8c36"
+    },
+    "collection": "AgentMetadata"
+  },
+  {
+    "record": {
+      "id": "d1KcSh",
+      "created_at": "2025-11-21T04:53:01.543721",
+      "metadata": {
+        "role": "Daily security check",
+        "description": "Scan logs for anomalies every 24 hours",
+        "expected_output": "Daily anomaly summary"
+      },
+      "type": "tasks",
+      "agent_id": "CM4fPo",
+      "_id": "ac16f08a0fedc77050e1d05ca9008e91",
+      "_rev": "1-edf4c90b57d9908d2fd18a4ed7e7bf22"
+    },
+    "collection": "TaskMetadata"
+  },
+  {
+    "record": {
+      "id": "2cZXe6",
+      "created_at": "2025-11-21T04:54:12.408092",
+      "metadata": {
+        "role": "Linux security log auditor",
+        "goal": "Detect anomalies in Ubuntu logs",
+        "backstory": "SRE with deep security experience",
+        "description": "Scans syslog and auth.log",
+        "expected_output": "JSON anomaly report"
+      },
+      "type": "agents",
+      "_id": "ac16f08a0fedc77050e1d05ca900938c",
+      "_rev": "1-773f088b512bb64a1e8f3a3ed212dc0a"
+    },
+    "collection": "AgentMetadata"
+  },
+  {
+    "record": {
+      "id": "mw7epv",
+      "created_at": "2025-11-21T04:54:12.430534",
+      "metadata": {
+        "role": "Daily security check",
+        "description": "Scan logs for anomalies every 24 hours",
+        "expected_output": "Daily anomaly summary"
+      },
+      "type": "tasks",
+      "agent_id": "2cZXe6",
+      "_id": "ac16f08a0fedc77050e1d05ca900a182",
+      "_rev": "1-9b048f36b0fab338b7e92f1bd58e4100"
+    },
+    "collection": "TaskMetadata"
+  },
+  {
+    "record": {
+      "id": "Bt2y3G",
+      "created_at": "2025-11-21T05:06:39.330911",
+      "metadata": {
+        "role": "Linux security log auditor",
+        "goal": "Detect anomalies in Ubuntu logs",
+        "backstory": "SRE with deep security experience",
+        "description": "Scans syslog and auth.log",
+        "expected_output": "JSON anomaly report"
+      },
+      "type": "agents",
+      "_id": "ac16f08a0fedc77050e1d05ca900a3aa",
+      "_rev": "1-9eff37a63acc0fe2678bd2db934fa0be"
+    },
+    "collection": "AgentMetadata"
+  },
+  {
+    "record": {
+      "id": "j0Hj3b",
+      "created_at": "2025-11-21T05:06:39.350164",
+      "metadata": {
+        "role": "Daily security check",
+        "description": "Scan logs for anomalies every 24 hours",
+        "expected_output": "Daily anomaly summary"
+      },
+      "type": "tasks",
+      "agent_id": "Bt2y3G",
+      "_id": "ac16f08a0fedc77050e1d05ca900ab19",
+      "_rev": "1-7ed31cad9812c5b3a71a87ae7051784d"
+    },
+    "collection": "TaskMetadata"
+  },
+  {
+    "record": {
+      "id": "G3BzWy",
+      "created_at": "2025-11-21T05:29:29.608284",
+      "metadata": {
+        "role": "Linux security log auditor",
+        "goal": "Detect anomalies in Ubuntu logs",
+        "backstory": "SRE with deep security experience",
+        "description": "Scans syslog and auth.log",
+        "expected_output": "JSON anomaly report"
+      },
+      "type": "agents",
+      "_id": "ac16f08a0fedc77050e1d05ca900b833",
+      "_rev": "1-62a6a6ce830500defa72a004a37448da"
+    },
+    "collection": "AgentMetadata"
+  },
+  {
+    "record": {
+      "id": "oh2iwh",
+      "created_at": "2025-11-21T05:29:29.667546",
+      "metadata": {
+        "role": "Daily security check",
+        "description": "Scan logs for anomalies every 24 hours",
+        "expected_output": "Daily anomaly summary"
+      },
+      "type": "tasks",
+      "agent_id": "G3BzWy",
+      "_id": "ac16f08a0fedc77050e1d05ca900bb9f",
+      "_rev": "1-8b83408269b630a57d2a278eb2286458"
+    },
+    "collection": "TaskMetadata"
+  }
+]

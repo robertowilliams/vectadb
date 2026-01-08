@@ -1,0 +1,20 @@
+services:
+  couchdb:
+    image: couchdb:latest
+    container_name: couchdb
+    ports:
+      - "5984:5984"
+    environment:
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: 041HIq9n4ZOymK4Ryy
+    volumes:
+      - couchdb-data:/opt/couchdb/data
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    external: true
+
+volumes:
+  couchdb-data:

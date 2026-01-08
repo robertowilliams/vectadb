@@ -1,0 +1,3 @@
+docker exec -it 6dc035387883  sh
+apk add --no-cache curl  # if needed
+curl http://prometheus:9090/api/v1/status/buildinfo 

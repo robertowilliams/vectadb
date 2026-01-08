@@ -1,5 +1,6 @@
 // VectaDB library exports for testing and external use
 
+pub mod analytics;
 pub mod api;
 pub mod config;
 pub mod db;

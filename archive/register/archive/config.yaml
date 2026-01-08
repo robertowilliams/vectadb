@@ -1,0 +1,32 @@
+server:
+  host: 0.0.0.0
+  port: 5432
+
+couch:
+  host: 127.0.0.1
+  port: 5984
+  user: admin
+  password: 041HIq9n4ZOymK4Ryy
+  url: http://admin:041HIq9n4ZOymK4Ryy@127.0.0.1:5984
+  db_name: enroll
+  agent_collection_name: agents
+  task_collection_name: tasks
+
+weaviate:
+  host: 127.0.0.1
+  port: 8080
+  api_key: W3jTqerhvJ9lf5ht3ybqq7Sz
+  class_name_agent: AgentMetadata
+  class_name_task: TaskMetadata
+
+nebula:
+  graphd_host: 127.0.0.1
+  graphd_port: 9669
+  user: root
+  password: ""
+
+neo4j:
+  url: 'neo4j://127.0.0.1:7687'
+  user: 'neo4j'
+  #password: '2n8GrIHVw1m74pCkSr1iq0Fy'
+  password: 'xNWpMw7Dhy7qbUdUtJGfdB2JZrHV83VeksWKFdp2CgyphBZdwNwGdwi6dwVBFdBL'

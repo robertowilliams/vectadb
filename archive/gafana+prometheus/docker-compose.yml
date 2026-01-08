@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      # Mount the whole config dir (containing prometheus.yml)
+      - ./config:/etc/prometheus
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=16vbqWG5tpGfgbK8cICxUVvp
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - grafana_data:/var/lib/grafana
+    networks:
+      - monitoring
+
+volumes:
+  grafana_data:
+  prometheus_data:
+
+networks:
+  monitoring:
+    external: true

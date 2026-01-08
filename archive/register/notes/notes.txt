@@ -1,0 +1,331 @@
+curl -X POST "http://localhost:5432/logs" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: SfE4Vf5jkVQ4v27MrNC72R6H" \
+  -d '{
+    "agent_id": "4CtdpE",
+    "task_id": "0MWLNi",
+    "level": "ERROR",
+    "message": "ETL pipeline failed",
+    "metadata": {
+      "error": "FileNotFound",
+      "file": "s3://bucket/logs/2025-01-27/log.json"
+    }
+  }'
+
+
+
+export AGENT_REGISTRY_URL=http://localhost:5432
+export RPC_API_KEY=SfE4Vf5jkVQ4v27MrNC72R6H
+
+curl -s -X POST "$AGENT_REGISTRY_URL/agents" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $RPC_API_KEY" \
+  -d '{
+    "method": "create_id",
+    "params": {
+      "metadata": {
+        "role": "Security log auditor",
+        "goal": "Detect anomalies in Ubuntu system logs",
+        "backstory": "Senior SRE with deep Linux experience",
+        "description": "Agent specialized in scanning syslog, auth.log and kernel logs",
+        "expected_output": "JSON report listing anomalies and risk scores"
+      }
+    },
+    "id": "1"
+  }' | jq
+
+
+
+
+curl -s -X POST "$AGENT_REGISTRY_URL/agents" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $RPC_API_KEY" \
+  -d '{
+    "method": "create_id",
+    "params": {
+      "metadata": {
+        "role": "Linux security log auditor",
+        "goal": "Find security anomalies in Ubuntu logs",
+        "backstory": "Expert in SIEM and Linux observability",
+        "description": "Agent that reviews syslog and auth.log to detect suspicious events",
+        "expected_output": "JSON summary of anomalies, with severity ranking"
+      }
+    },
+    "id": "2"
+  }' | jq
+
+
+
+export AGENT_REGISTRY_URL=http://localhost:5432
+export RPC_API_KEY=SfE4Vf5jkVQ4v27MrNC72R6H
+
+
+curl -s -X POST "$AGENT_REGISTRY_URL/tasks" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $RPC_API_KEY" \
+  -d "{
+    \"method\": \"create_id\",
+    \"params\": {
+      \"agent_id\": \"qY39At\",
+      \"metadata\": {
+        \"role\": \"Log audit task\",
+        \"description\": \"Daily security log scan\"
+      }
+    },
+    \"id\": \"2\"
+  }" | jq
+
+
+curl -s -X POST "$AGENT_REGISTRY_URL/logs" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $RPC_API_KEY" \
+  -d "{
+    \"agent_id\": \"qY39At\",
+    \"task_id\": \"rSehIv\",
+    \"level\": \"INFO\",
+    \"message\": \"Log ingestion test succeeded\"
+  }" | jq
+
+{
+  "status": "ok",
+  "log_id": "jHefsyGY1h",
+  "agent_id": "qY39At",
+  "task_id": "rSehIv"
+}
+
+curl -s -X POST "$AGENT_REGISTRY_URL/logs" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $RPC_API_KEY" \
+  -d "{
+    \"agent_id\": \"qY39At\",
+    \"task_id\": \"rSehIv\",
+    \"level\": \"ERROR\",
+    \"message\": \"This is an error log\"
+  }" | jq
+
+{
+  "status": "ok",
+  "log_id": "23VRRzgRN0",
+  "agent_id": "qY39At",
+  "task_id": "rSehIv"
+}
+
+
+curl -X DELETE "http://localhost:8080/v1/schema/AgentMetadata" \
+  -H "Authorization: Bearer W3jTqerhvJ9lf5ht3ybqq7Sz"
+  
+curl -X DELETE "http://localhost:8080/v1/schema/TaskMetadata" \
+  -H "Authorization: Bearer W3jTqerhvJ9lf5ht3ybqq7Sz"
+
+curl -s "http://localhost:8080/v1/objects" \
+  -H "Authorization: Bearer W3jTqerhvJ9lf5ht3ybqq7Sz" | jq
+
+
+
+curl -X POST "http://localhost:5432/embed" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: SfE4Vf5jkVQ4v27MrNC72R6H" \
+  -d '{"text": "Linux security log auditor with SIEM expertise"}' | jq
+
+
+curl -s -X POST "$AGENT_REGISTRY_URL/agents" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $RPC_API_KEY" \            
+  -d '{                                                               
+    "method": "create_id",
+    "params": {
+      "metadata": {
+        "role": "Security log auditor",
+        "goal": "Detect anomalies in Ubuntu system logs",
+        "backstory": "Senior SRE with deep Linux experience",
+        "description": "Agent specialized in scanning syslog, auth.log and kernel logs",
+        "expected_output": "JSON report listing anomalies and risk scores as well"
+      }
+    },
+    "id": "1"
+  }' | jq
+
+
+  lrccLb
+
+
+curl -s -X POST "$AGENT_REGISTRY_URL/tasks" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $RPC_API_KEY" \
+  -d "{
+    \"method\": \"create_id\",
+    \"params\": {
+      \"agent_id\": \"lrccLb\",
+      \"metadata\": {
+        \"description\": \"Audit logs curl test\",
+        \"expected_output\": \"List of anomalies\"
+      }
+    },
+    \"id\": \"1\"
+  }"
+
+NLbAXz
+
+curl -s -X POST "$AGENT_REGISTRY_URL/logs" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $RPC_API_KEY" \
+  -d "{
+    \"agent_id\": \"lrccLb\",
+    \"task_id\": \"NLbAXz\",
+    \"level\": \"INFO\",
+    \"message\": \"Curl test INFO log\",
+    \"metadata\": {\"phase\": \"curl-test\"}
+  }"
+
+{"status":"ok","log_id":"pn8P8MNHg4","agent_id":"lrccLb","task_id":"NLbAXz"}%  
+
+curl -s -X POST "$AGENT_REGISTRY_URL/logs" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $RPC_API_KEY" \
+  -d "{
+    \"agent_id\": \"lrccLb\",
+    \"task_id\": \"NLbAXz\",
+    \"level\": \"ERROR\",
+    \"message\": \"Curl test ERROR log\",
+    \"metadata\": {\"phase\": \"curl-test\"}
+  }"
+
+
+curl -s -X GET "$AGENT_REGISTRY_URL/couch/all?limit=500" \
+  -H "x-api-key: $RPC_API_KEY"
+
+
+curl -s "$AGENT_REGISTRY_URL/metrics" | grep lrccLb
+
+
+curl -s -X GET \
+  "$AGENT_REGISTRY_URL/similar/tasks?task_id=k7PJDb&threshold=0.6&limit=5" \
+  -H "x-api-key: $RPC_API_KEY"
+
+
+
+curl -s -X GET \
+  "$AGENT_REGISTRY_URL/similar/agents?agent_id=UQIbTb&threshold=0.6&limit=5" \
+  -H "x-api-key: $RPC_API_KEY"
+
+
+
+curl -X POST "http://localhost:5432/similar/agents/description" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $RPC_API_KEY" \
+  -d '{
+    "description": "Network AI Orchestrator.",
+    "similarity": 50,
+    "limit": 5
+  }' |jq
+
+
+
+curl -X POST "http://localhost:5432/similar/agents/description" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $RPC_API_KEY" \
+  -d '{
+    "role": "Network AI Orchestrator",
+    "goal": "Coordinate tools to debug network issues and optimize latency across nodes",
+    "backstory": "Senior AI agent for ISP ops",
+    "description": "Senior AI agent that coordinates multiple tools to debug network issues and optimize latency across nodes.",
+    "similarity": 95,
+    "limit": 5
+  }'
+
+
+
+curl -X POST "http://localhost:5432/similar/tasks/description" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $RPC_API_KEY" \
+  -d '{
+    "role": "Network diagnostic task",
+    "goal": "Scan network paths and detect latency anomalies",
+    "description": "Run a latency scan across all EPN nodes and flag outliers.",
+    "similarity": 55,
+    "limit": 5
+  }' | jq
+
+
+curl -X POST "http://localhost:5432/tasks" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $RPC_API_KEY" \
+  -d '{
+    "method": "create_id",
+    "id": "1",
+    "params": {
+      "agent_id": "1kQZib",
+      "length": 6,
+      "metadata": {
+        "role": "Network diagnostic task",
+        "goal": "Scan network paths and detect latency anomalies",
+        "backstory": "Recurring health-check job for the ISP backbone",
+        "description": "Run a latency scan across all EPN nodes and flag outliers and unstable links.",
+        "expected_output": "JSON list of nodes/links with abnormal latency and suggested actions",
+        "agent": "Network AI Orchestrator"
+      }
+    }
+  }'
+
+
+curl -X POST "http://localhost:5432/tasks" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $RPC_API_KEY" \
+  -d '{
+    "method": "create_id",
+    "id": "1",
+    "params": {
+      "agent_id": "1kQZib",
+      "length": 6,
+      "metadata": {
+        "role": "Network diagnostic task",
+        "goal": "Scan network paths and detect latency anomalies",
+        "backstory": "Recurring health-check job for the ISP backbone",
+        "description": "Run a latency scan across all EPN nodes and flag outliers and unstable links.",
+        "expected_output": "JSON list of nodes/links with abnormal latency and suggested actions",
+        "agent": "Network AI Orchestrator"
+      }
+    }
+  }'
+
+
+
+curl -s -X POST "$AGENT_REGISTRY_URL/agents" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $RPC_API_KEY" \
+  -d '{
+    "method": "create_id",
+    "params": {
+      "metadata": {
+        "role": "Security log auditor",
+        "goal": "Detect anomalies in Ubuntu system logs",
+        "backstory": "Senior SRE with deep Linux experience",
+        "description": "Agent specialized in scanning syslog, auth.log and kernel logs",
+        "expected_output": "JSON report listing anomalies and risk scores"
+      }
+    },
+    "id": "1"
+  }' | jq
+
+{"jsonrpc":"2.0","result":{"status":"ok","id":"Npt0Ti","collection":"tasks"},"id":"1"}%   
+
+
+  curl -X POST "http://localhost:5432/tasks" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $RPC_API_KEY" \
+  -d '{
+    "method": "create_id",
+    "id": "1",
+    "params": {
+      "agent_id": "Npt0Ti",
+      "length": 6,
+      "metadata": {
+        "role": "Network diagnostic task",
+        "goal": "Scan network paths and detect latency anomalies",
+        "backstory": "Recurring health-check job for the ISP backbone",
+        "description": "Run a latency scan across all EPN nodes and flag outliers and unstable links.",
+        "expected_output": "JSON list of nodes/links with abnormal latency and suggested actions",
+        "agent": "Network AI Orchestrator"
+      }
+    }
+  }'

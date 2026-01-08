@@ -1,0 +1,7 @@
+uvicorn
+couchdb
+chromadb
+fastapi
+sentence-transformers
+neo4j
+prometheus_client

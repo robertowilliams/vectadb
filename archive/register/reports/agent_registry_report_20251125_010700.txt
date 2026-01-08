@@ -1,0 +1,34 @@
+Agent Registry test report - 2025-11-25 01:07:00 UTC
+Base URL: http://localhost:5432
+
+=== Agent Created ===
+Agent ID: twzJQT
+Agent metadata:
+  role: Network Troubleshooting Support Agent
+  goal: Help diagnose issues in multi-agent / crew executions
+  backstory: This agent is part of an auditing and observability system.
+It explains how agents, tasks, tracing and similarity search
+work inside the Agent Registry.
+
+Similar agents (from /agents create_id):
+  - bixgC8 (similarity=1.000)
+
+=== Tasks Created ===
+Task 1 ID: eZSvuV
+  description: Analyze CrewAI execution logs and highlight potential failures.
+  expected_output: A summarized list of failures and warnings from the logs.
+
+Task 2 ID: k65fnu
+  description: Detect anomalous patterns in agent interactions using embeddings.
+  expected_output: A report with anomalies and suggested investigations.
+
+Task 3 ID: 7Rz5y9
+  description: Summarize recent CrewAI traces and suggest improvements.
+  expected_output: A concise summary of traces and recommendations.
+
+
+=== Similar Tasks ===
+No similar tasks found.
+
+=== Similar Agents ===
+No similar agents found.

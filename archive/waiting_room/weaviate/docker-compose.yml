@@ -1,0 +1,42 @@
+---
+services:
+  weaviate:
+    command:
+    - --host
+    - 0.0.0.0
+    - --port
+    - '8080'
+    - --scheme
+    - http
+    image: cr.weaviate.io/semitechnologies/weaviate:1.34.0
+    ports:
+    - 8080:8080
+    - 50051:50051
+    volumes:
+    - weaviate_data:/var/lib/weaviate
+    restart: on-failure:0
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      ENABLE_MODULES: 'text2vec-transformers,text2vec-model2vec'
+      CLUSTER_HOSTNAME: 'node1'
+      TRANSFORMERS_INFERENCE_API: http://text2vec-transformers:8080
+      MODEL2VEC_INFERENCE_API: http://text2vec-model2vec:8080
+
+  text2vec-transformers:
+    image: cr.weaviate.io/semitechnologies/transformers-inference:sentence-transformers-multi-qa-MiniLM-L6-cos-v1
+    environment:
+      ENABLE_CUDA: '0'
+
+  text2vec-model2vec:
+    image: cr.weaviate.io/semitechnologies/model2vec-inference:minishlab-potion-base-32M
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    external: true
+
+volumes:
+  weaviate_data:

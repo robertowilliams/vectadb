@@ -1,0 +1,21 @@
+services:
+  loki:
+    image: grafana/loki:2.9.2
+    container_name: loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./config/loki-config.yml:/etc/loki/loki-config.yml
+      - ./loki-data/wal:/wal
+      - ./loki-data/chunks:/loki/chunks
+      - ./loki-data/index:/loki/index
+      - ./loki-data/cache:/loki/cache
+      - ./loki-data/compactor:/loki/compactor
+    command: -config.file=/etc/loki/loki-config.yml
+    restart: unless-stopped
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    external: true

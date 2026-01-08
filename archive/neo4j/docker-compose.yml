@@ -1,0 +1,28 @@
+services:
+  neo4j:
+    image: neo4j
+    #user: "${UID}:${GID}"
+    restart: always
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j-data:/data
+      - /Users/roberto/Desktop/vecgraph-main/neo4j/plugins:/plugins
+      - /Users/roberto/Desktop/vecgraph-main/neo4j/conf:/conf 
+    environment:
+      - NEO4J_AUTH=neo4j/xNWpMw7Dhy7qbUdUtJGfdB2JZrHV83VeksWKFdp2CgyphBZdwNwGdwi6dwVBFdBL
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_apoc_import_file_use__neo4j__config=true 
+      - NEO4J_dbms_memory_pagecache_size=3G
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    external: true
+
+volumes:
+  neo4j-data:
