@@ -19,7 +19,7 @@ dependencies = [
     "python-multipart>=0.0.20",
     "pyyaml>=6.0.3",
     "reportlab>=4.4.5",
-    "requests==2.32.3",
+    "requests==2.32.4",
     "sentence-transformers==3.0.1",
     "uvicorn[standard]==0.30.0",
     "weaviate-client>=4.18.0",
