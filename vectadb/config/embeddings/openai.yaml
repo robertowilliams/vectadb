@@ -1,19 +1,15 @@
-# OpenAI Embedding Plugin Configuration
+# Synthetic API Embedding Plugin Configuration (OpenAI-compatible)
 #
-# Usage:
-#   1. Set your OpenAI API key as environment variable: export OPENAI_API_KEY="sk-..."
-#   2. Or replace ${OPENAI_API_KEY} below with your actual key (not recommended for production)
+# Using Synthetic API with nomic-embed model via OpenAI-compatible endpoint
 #
 # Models available:
-#   - text-embedding-3-small (1536 dimensions, $0.02/1M tokens) - Fast and cheap
-#   - text-embedding-3-large (3072 dimensions, $0.13/1M tokens) - Best quality
-#   - text-embedding-ada-002 (1536 dimensions) - Legacy model
+#   - hf:nomic-ai/nomic-embed-text-v1.5 (768 dimensions)
 
 name: "openai"
 provider: "openai"
 api_key: "${OPENAI_API_KEY}"
-model: "text-embedding-3-small"
-base_url: "https://api.openai.com/v1"
-dimension: 1536
-batch_size: 2048
-timeout_secs: 30
+model: "hf:nomic-ai/nomic-embed-text-v1.5"
+base_url: "https://api.synthetic.new/openai/v1"
+dimension: 768
+batch_size: 100
+timeout_secs: 60

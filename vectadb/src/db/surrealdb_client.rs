@@ -112,6 +112,8 @@ impl SurrealDBClient {
                 "DEFINE TABLE IF NOT EXISTS entity SCHEMAFULL;
                  DEFINE FIELD IF NOT EXISTS entity_type ON entity TYPE string;
                  DEFINE FIELD IF NOT EXISTS properties ON entity TYPE object;
+                 DEFINE FIELD IF NOT EXISTS embedding ON entity TYPE option<array>;
+                 DEFINE FIELD IF NOT EXISTS metadata ON entity TYPE option<object>;
                  DEFINE FIELD IF NOT EXISTS created_at ON entity TYPE datetime;
                  DEFINE FIELD IF NOT EXISTS updated_at ON entity TYPE datetime;
                  DEFINE INDEX IF NOT EXISTS idx_type ON entity COLUMNS entity_type;",
@@ -247,16 +249,20 @@ impl SurrealDBClient {
     pub async fn create_entity(&self, entity: &Entity) -> Result<String> {
         debug!("Creating entity of type: {}", entity.entity_type);
 
+        // Create record with explicit ID using the tuple format (table, id)
+        // When using tuple format, insert() returns Option<T> instead of Vec<T>
         let entity_clone = entity.clone();
+        let record_id = entity.id.clone();
+
         let created: Option<Entity> = self
             .db
-            .create(("entity", entity.id.clone()))
+            .insert(("entity", record_id.as_str()))
             .content(entity_clone)
             .await
-            .context("Failed to create entity")?;
+            .context("Failed to insert entity")?;
 
         let entity_id = created
-            .ok_or_else(|| anyhow::anyhow!("Failed to create entity"))?
+            .ok_or_else(|| anyhow::anyhow!("Failed to create entity - no record returned"))?
             .id;
 
         debug!("Created entity: {}", entity_id);
@@ -353,16 +359,20 @@ impl SurrealDBClient {
             relation.source_id, relation.relation_type, relation.target_id
         );
 
+        // Create record with explicit ID using the tuple format (table, id)
+        // When using tuple format, insert() returns Option<T> instead of Vec<T>
         let relation_clone = relation.clone();
+        let record_id = relation.id.clone();
+
         let created: Option<Relation> = self
             .db
-            .create(("relation", relation.id.clone()))
+            .insert(("relation", record_id.as_str()))
             .content(relation_clone)
             .await
-            .context("Failed to create relation")?;
+            .context("Failed to insert relation")?;
 
         let relation_id = created
-            .ok_or_else(|| anyhow::anyhow!("Failed to create relation"))?
+            .ok_or_else(|| anyhow::anyhow!("Failed to create relation - no record returned"))?
             .id;
 
         debug!("Created relation: {}", relation_id);

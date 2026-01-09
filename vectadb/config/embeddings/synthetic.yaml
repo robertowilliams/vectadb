@@ -1,0 +1,15 @@
+# Synthetic API Embedding Plugin Configuration
+# Using OpenAI-compatible endpoint with nomic-embed model
+#
+# Usage:
+#   Set EMBEDDING_PROVIDER=openai in .env
+#   Set OPENAI_API_KEY to Synthetic API key
+
+name: "synthetic"
+provider: "openai"
+api_key: "${SYNTHETIC_API_KEY}"
+model: "hf:nomic-ai/nomic-embed-text-v1.5"
+base_url: "https://api.synthetic.new/openai/v1"
+dimension: 768
+batch_size: 100
+timeout_secs: 60
