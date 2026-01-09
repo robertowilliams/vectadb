@@ -10,9 +10,8 @@
 // Run with: cargo run --example embedding_plugins
 
 use std::fs;
-use vectadb::embeddings::{
-    CoherePlugin, EmbeddingPlugin, HuggingFacePlugin, OpenAIPlugin, PluginConfig, PluginRegistry,
-};
+use vectadb::embeddings::plugin::{EmbeddingPlugin, PluginConfig, PluginRegistry};
+use vectadb::embeddings::plugins::{CoherePlugin, HuggingFacePlugin, OpenAIPlugin};
 
 #[tokio::main]
 async fn main() {
@@ -174,13 +173,13 @@ async fn load_and_test_plugin<P: EmbeddingPlugin + Default>(
 
     // Check if API key is set (not just placeholder)
     let has_real_key = match &config.provider {
-        vectadb::embeddings::ProviderConfig::OpenAI { api_key, .. }
-        | vectadb::embeddings::ProviderConfig::Cohere { api_key, .. }
-        | vectadb::embeddings::ProviderConfig::HuggingFace { api_key, .. }
-        | vectadb::embeddings::ProviderConfig::Voyage { api_key, .. } => {
+        vectadb::embeddings::plugin::ProviderConfig::OpenAI { api_key, .. }
+        | vectadb::embeddings::plugin::ProviderConfig::Cohere { api_key, .. }
+        | vectadb::embeddings::plugin::ProviderConfig::HuggingFace { api_key, .. }
+        | vectadb::embeddings::plugin::ProviderConfig::Voyage { api_key, .. } => {
             !api_key.starts_with("${") && !api_key.is_empty()
         }
-        vectadb::embeddings::ProviderConfig::Local { .. } => true,
+        vectadb::embeddings::plugin::ProviderConfig::Local { .. } => true,
     };
 
     if !has_real_key {

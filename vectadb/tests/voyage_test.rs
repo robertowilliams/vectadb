@@ -1,7 +1,8 @@
 // Integration tests for Voyage plugin
 #[cfg(test)]
 mod voyage_tests {
-    use vectadb::embeddings::{VoyagePlugin, EmbeddingPlugin, PluginConfig, ProviderConfig};
+    use vectadb::embeddings::plugin::{EmbeddingPlugin, PluginConfig, ProviderConfig};
+    use vectadb::embeddings::plugins::VoyagePlugin;
 
     #[tokio::test]
     #[ignore] // Only run with real API key: cargo test -- --ignored
@@ -21,7 +22,7 @@ mod voyage_tests {
             },
         };
 
-        let mut plugin = VoyagePlugin::new();
+        let mut plugin: VoyagePlugin = VoyagePlugin::new();
         plugin.initialize(config).await.expect("Failed to initialize plugin");
 
         // Test single embedding

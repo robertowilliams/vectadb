@@ -1162,6 +1162,7 @@ async fn get_or_create_trace_by_session(
     #[derive(Debug, serde::Deserialize)]
     struct TraceRecord {
         id: String,
+        #[allow(dead_code)] // Reserved for future time-based filtering
         start_time: Option<String>,
     }
 

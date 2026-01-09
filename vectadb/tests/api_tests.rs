@@ -9,7 +9,7 @@ use tower::ServiceExt;
 
 // Helper to create test app
 fn create_test_app() -> axum::Router {
-    vectadb::api::create_router()
+    vectadb::api::routes::create_router()
 }
 
 // Helper to parse JSON response

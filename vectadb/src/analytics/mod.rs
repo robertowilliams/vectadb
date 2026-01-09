@@ -11,7 +11,8 @@ pub use aggregator::{MetricsAggregator, TimeWindow};
 pub use analyzer::{QueryAnalyzer, AnomalyDetector};
 
 use serde::{Deserialize, Serialize};
-use std::time::Duration;
+// Duration reserved for future time window configurations
+// use std::time::Duration;
 
 /// Analytics configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
