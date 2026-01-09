@@ -14,8 +14,8 @@ tower = "0.4"
 tower-http = { version = "0.5", features = ["cors", "trace", "fs"] }
 
 # Database clients
-surrealdb = { version = "2.1", features = ["protocol-http"] }
-qdrant-client = "1.10"
+surrealdb = { version = "2.4", features = ["protocol-http"] }
+qdrant-client = "1.16"
 
 # Serialization
 serde = { version = "1", features = ["derive"] }
@@ -26,7 +26,7 @@ sentence-transformers-rs = { git = "https://github.com/jwnz/sentence-transformer
 candle-core = "0.9"
 
 # HTTP client for embedding plugins
-reqwest = { version = "0.11", features = ["json"] }
+reqwest = { version = "0.12", features = ["json"] }
 async-trait = "0.1"
 
 # Configuration
@@ -37,7 +37,7 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 
 # Metrics
-prometheus = "0.13"
+prometheus = "0.14"
 
 # Error handling
 anyhow = "1"
