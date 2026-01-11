@@ -76,6 +76,13 @@ class VectaDBClient {
     return data
   }
 
+  async listEntities(limit?: number): Promise<Entity[]> {
+    const { data } = await this.client.get('/api/v1/entities', {
+      params: { limit: limit || 1000 }
+    })
+    return data.entities || []
+  }
+
   async validateEntity(type: string, properties: Record<string, any>): Promise<ValidationResponse> {
     const { data } = await this.client.post('/api/v1/validate/entity', { type, properties })
     return data
@@ -95,6 +102,13 @@ class VectaDBClient {
   async deleteRelation(relationId: string): Promise<{ message: string }> {
     const { data } = await this.client.delete(`/api/v1/relations/${relationId}`)
     return data
+  }
+
+  async listRelations(limit?: number): Promise<Relation[]> {
+    const { data } = await this.client.get('/api/v1/relations', {
+      params: { limit: limit || 1000 }
+    })
+    return data.relations || []
   }
 
   // Queries

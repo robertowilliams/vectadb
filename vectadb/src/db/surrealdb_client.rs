@@ -4,6 +4,7 @@ use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use surrealdb::engine::remote::http::{Client, Http};
 use surrealdb::opt::auth::Root;
+use surrealdb::sql::Datetime;
 use surrealdb::Surreal;
 use std::sync::Arc;
 use tracing::{debug, info, warn};
@@ -25,7 +26,7 @@ struct OntologyRecord {
     namespace: String,
     version: String,
     schema_json: String,
-    created_at: chrono::DateTime<chrono::Utc>,
+    created_at: Datetime,
 }
 
 impl SurrealDBClient {
@@ -111,11 +112,11 @@ impl SurrealDBClient {
             .query(
                 "DEFINE TABLE IF NOT EXISTS entity SCHEMAFULL;
                  DEFINE FIELD IF NOT EXISTS entity_type ON entity TYPE string;
-                 DEFINE FIELD IF NOT EXISTS properties ON entity TYPE object;
+                 DEFINE FIELD IF NOT EXISTS properties ON entity FLEXIBLE TYPE object;
                  DEFINE FIELD IF NOT EXISTS embedding ON entity TYPE option<array>;
-                 DEFINE FIELD IF NOT EXISTS metadata ON entity TYPE option<object>;
-                 DEFINE FIELD IF NOT EXISTS created_at ON entity TYPE datetime;
-                 DEFINE FIELD IF NOT EXISTS updated_at ON entity TYPE datetime;
+                 DEFINE FIELD IF NOT EXISTS metadata ON entity FLEXIBLE TYPE option<object>;
+                 DEFINE FIELD IF NOT EXISTS created_at ON entity TYPE datetime DEFAULT time::now();
+                 DEFINE FIELD IF NOT EXISTS updated_at ON entity TYPE datetime DEFAULT time::now();
                  DEFINE INDEX IF NOT EXISTS idx_type ON entity COLUMNS entity_type;",
             )
             .await
@@ -128,8 +129,8 @@ impl SurrealDBClient {
                  DEFINE FIELD IF NOT EXISTS relation_type ON relation TYPE string;
                  DEFINE FIELD IF NOT EXISTS source_id ON relation TYPE string;
                  DEFINE FIELD IF NOT EXISTS target_id ON relation TYPE string;
-                 DEFINE FIELD IF NOT EXISTS properties ON relation TYPE object;
-                 DEFINE FIELD IF NOT EXISTS created_at ON relation TYPE datetime;
+                 DEFINE FIELD IF NOT EXISTS properties ON relation FLEXIBLE TYPE object;
+                 DEFINE FIELD IF NOT EXISTS created_at ON relation TYPE datetime DEFAULT time::now();
                  DEFINE INDEX IF NOT EXISTS idx_relation_type ON relation COLUMNS relation_type;
                  DEFINE INDEX IF NOT EXISTS idx_source ON relation COLUMNS source_id;
                  DEFINE INDEX IF NOT EXISTS idx_target ON relation COLUMNS target_id;",
@@ -206,17 +207,24 @@ impl SurrealDBClient {
             namespace: schema.namespace.clone(),
             version: schema.version.clone(),
             schema_json,
-            created_at: chrono::Utc::now(),
+            created_at: Datetime::default(),
         };
 
-        self.db
-            .create::<Option<OntologyRecord>>(("ontology_schema", schema.namespace.clone()))
+        // Use upsert to handle dotted namespaces and updates
+        match self.db
+            .upsert::<Option<OntologyRecord>>(("ontology_schema", schema.namespace.clone()))
             .content(record)
             .await
-            .context("Failed to store ontology schema")?;
-
-        info!("Stored ontology schema: {}", schema.namespace);
-        Ok(())
+        {
+            Ok(_) => {
+                info!("Stored ontology schema: {}", schema.namespace);
+                Ok(())
+            }
+            Err(e) => {
+                warn!("Failed to upsert ontology schema: {:?}", e);
+                Err(anyhow::anyhow!("Failed to store ontology schema: {:?}", e))
+            }
+        }
     }
 
     /// Get the current ontology schema
@@ -249,24 +257,33 @@ impl SurrealDBClient {
     pub async fn create_entity(&self, entity: &Entity) -> Result<String> {
         debug!("Creating entity of type: {}", entity.entity_type);
 
-        // Create record with explicit ID using the tuple format (table, id)
-        // When using tuple format, insert() returns Option<T> instead of Vec<T>
-        let entity_clone = entity.clone();
-        let record_id = entity.id.clone();
+        // Create record using SurrealDB query to avoid datetime serialization issues
+        let record_id_string = entity.id_string();
 
-        let created: Option<Entity> = self
+        // Use SurrealDB query with bind parameters and explicit datetime values
+        let query = format!(
+            "CREATE entity:⟨{}⟩ SET entity_type = $entity_type, properties = $properties, embedding = $embedding, metadata = $metadata, created_at = time::now(), updated_at = time::now()",
+            record_id_string
+        );
+
+        match self
             .db
-            .insert(("entity", record_id.as_str()))
-            .content(entity_clone)
+            .query(query)
+            .bind(("entity_type", entity.entity_type.clone()))
+            .bind(("properties", serde_json::to_value(&entity.properties)?))
+            .bind(("embedding", entity.embedding.clone()))
+            .bind(("metadata", serde_json::to_value(&entity.metadata)?))
             .await
-            .context("Failed to insert entity")?;
-
-        let entity_id = created
-            .ok_or_else(|| anyhow::anyhow!("Failed to create entity - no record returned"))?
-            .id;
-
-        debug!("Created entity: {}", entity_id);
-        Ok(entity_id)
+        {
+            Ok(_) => {
+                debug!("Created entity: {}", record_id_string);
+                Ok(record_id_string)
+            }
+            Err(e) => {
+                warn!("Failed to insert entity of type {}: {:?}", entity.entity_type, e);
+                Err(anyhow::anyhow!("Failed to insert entity: {:?}", e))
+            }
+        }
     }
 
     /// Get an entity by ID
@@ -359,24 +376,33 @@ impl SurrealDBClient {
             relation.source_id, relation.relation_type, relation.target_id
         );
 
-        // Create record with explicit ID using the tuple format (table, id)
-        // When using tuple format, insert() returns Option<T> instead of Vec<T>
-        let relation_clone = relation.clone();
-        let record_id = relation.id.clone();
+        // Create record using SurrealDB query to avoid datetime serialization issues
+        let record_id_string = relation.id_string();
 
-        let created: Option<Relation> = self
+        // Use SurrealDB query with bind parameters and explicit datetime
+        let query = format!(
+            "CREATE relation:⟨{}⟩ SET relation_type = $relation_type, source_id = $source_id, target_id = $target_id, properties = $properties, created_at = time::now()",
+            record_id_string
+        );
+
+        match self
             .db
-            .insert(("relation", record_id.as_str()))
-            .content(relation_clone)
+            .query(query)
+            .bind(("relation_type", relation.relation_type.clone()))
+            .bind(("source_id", relation.source_id.clone()))
+            .bind(("target_id", relation.target_id.clone()))
+            .bind(("properties", serde_json::to_value(&relation.properties)?))
             .await
-            .context("Failed to insert relation")?;
-
-        let relation_id = created
-            .ok_or_else(|| anyhow::anyhow!("Failed to create relation - no record returned"))?
-            .id;
-
-        debug!("Created relation: {}", relation_id);
-        Ok(relation_id)
+        {
+            Ok(_) => {
+                debug!("Created relation: {}", record_id_string);
+                Ok(record_id_string)
+            }
+            Err(e) => {
+                warn!("Failed to insert relation {}: {:?}", relation.relation_type, e);
+                Err(anyhow::anyhow!("Failed to insert relation: {:?}", e))
+            }
+        }
     }
 
     /// Get a relation by ID
@@ -510,7 +536,7 @@ impl SurrealDBClient {
                     // Get target entity
                     if let Some(target) = self.get_entity(&relation.target_id).await? {
                         result.push(target.clone());
-                        next_level.push(target.id);
+                        next_level.push(target.id_string());
                     }
                 }
             }

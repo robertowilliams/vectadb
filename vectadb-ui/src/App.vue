@@ -30,11 +30,47 @@
           </li>
           <li>
             <router-link
+              to="/relations"
+              class="flex items-center p-2 rounded-lg hover:bg-slate-700 transition-colors"
+              active-class="bg-primary-600 hover:bg-primary-700"
+            >
+              <span class="ml-3">Relations</span>
+            </router-link>
+          </li>
+          <li>
+            <router-link
+              to="/graph"
+              class="flex items-center p-2 rounded-lg hover:bg-slate-700 transition-colors"
+              active-class="bg-primary-600 hover:bg-primary-700"
+            >
+              <span class="ml-3">Graph</span>
+            </router-link>
+          </li>
+          <li>
+            <router-link
+              to="/query"
+              class="flex items-center p-2 rounded-lg hover:bg-slate-700 transition-colors"
+              active-class="bg-primary-600 hover:bg-primary-700"
+            >
+              <span class="ml-3">Query</span>
+            </router-link>
+          </li>
+          <li>
+            <router-link
               to="/schema"
               class="flex items-center p-2 rounded-lg hover:bg-slate-700 transition-colors"
               active-class="bg-primary-600 hover:bg-primary-700"
             >
               <span class="ml-3">Schema</span>
+            </router-link>
+          </li>
+          <li>
+            <router-link
+              to="/events"
+              class="flex items-center p-2 rounded-lg hover:bg-slate-700 transition-colors"
+              active-class="bg-primary-600 hover:bg-primary-700"
+            >
+              <span class="ml-3">Events</span>
             </router-link>
           </li>
         </ul>

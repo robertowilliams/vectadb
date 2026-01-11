@@ -152,6 +152,19 @@ export const useVectaDBStore = defineStore('vectadb', () => {
     }
   }
 
+  async function fetchEntities(limit?: number) {
+    try {
+      loading.value = true
+      error.value = null
+      entities.value = await vectadbClient.listEntities(limit)
+    } catch (e: any) {
+      error.value = e.message || 'Failed to fetch entities'
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function createRelation(type: string, fromEntityId: string, toEntityId: string, properties?: Record<string, any>) {
     try {
       loading.value = true
@@ -198,6 +211,19 @@ export const useVectaDBStore = defineStore('vectadb', () => {
     }
   }
 
+  async function fetchRelations(limit?: number) {
+    try {
+      loading.value = true
+      error.value = null
+      relations.value = await vectadbClient.listRelations(limit)
+    } catch (e: any) {
+      error.value = e.message || 'Failed to fetch relations'
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
   function addActivity(activity: RecentActivity) {
     recentActivities.value.unshift(activity)
     // Keep only last 50 activities
@@ -230,8 +256,10 @@ export const useVectaDBStore = defineStore('vectadb', () => {
     createEntity,
     updateEntity,
     deleteEntity,
+    fetchEntities,
     createRelation,
     deleteRelation,
+    fetchRelations,
     clearError,
   }
 })

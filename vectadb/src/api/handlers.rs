@@ -108,6 +108,19 @@ pub async fn upload_schema(
     let namespace = schema.namespace.clone();
     let version = schema.version.clone();
 
+    // Persist schema to SurrealDB if available
+    if let Some(surreal) = &state.surreal {
+        surreal
+            .store_schema(&schema)
+            .await
+            .map_err(|e| {
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(ErrorResponse::new("DatabaseError", format!("Failed to persist schema: {}", e))),
+                )
+            })?;
+    }
+
     // Create new reasoner with schema
     let reasoner = OntologyReasoner::new(schema);
 
@@ -512,7 +525,7 @@ pub async fn create_entity(
     Ok(Json(CreateEntityResponse {
         id: entity_id,
         entity_type: entity.entity_type,
-        created_at: entity.created_at.to_rfc3339(),
+        created_at: entity.created_at.to_string(),
     }))
 }
 
@@ -553,12 +566,12 @@ pub async fn get_entity(
         })?;
 
     Ok(Json(EntityResponse {
-        id: entity.id,
+        id: entity.id_string(),
         entity_type: entity.entity_type,
         properties: entity.properties,
         embedding: entity.embedding,
-        created_at: entity.created_at.to_rfc3339(),
-        updated_at: entity.updated_at.to_rfc3339(),
+        created_at: entity.created_at.to_string(),
+        updated_at: entity.updated_at.to_string(),
         metadata: entity.metadata,
     }))
 }
@@ -603,7 +616,7 @@ pub async fn update_entity(
 
     // Update properties
     entity.properties = request.properties;
-    entity.updated_at = chrono::Utc::now();
+    entity.updated_at = surrealdb::sql::Datetime::default();
 
     // Validate if ontology is loaded
     let reasoner = state.reasoner.read().await;
@@ -822,7 +835,7 @@ pub async fn create_relation(
         relation_type: relation.relation_type,
         source_id: relation.source_id,
         target_id: relation.target_id,
-        created_at: relation.created_at.to_rfc3339(),
+        created_at: relation.created_at.to_string(),
     }))
 }
 
@@ -863,12 +876,12 @@ pub async fn get_relation(
         })?;
 
     Ok(Json(RelationResponse {
-        id: relation.id,
+        id: relation.id_string(),
         relation_type: relation.relation_type,
         source_id: relation.source_id,
         target_id: relation.target_id,
         properties: relation.properties,
-        created_at: relation.created_at.to_rfc3339(),
+        created_at: relation.created_at.to_string(),
     }))
 }
 

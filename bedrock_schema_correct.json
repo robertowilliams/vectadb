@@ -1,0 +1,172 @@
+{
+  "namespace": "bedrock.healthcare",
+  "version": "1.0.0",
+  "entity_types": {
+    "BedrockRequest": {
+      "id": "BedrockRequest",
+      "label": "Bedrock Request",
+      "parent": null,
+      "properties": [
+        {
+          "name": "request_id",
+          "property_type": {
+            "type": "String"
+          },
+          "required": true,
+          "cardinality": "One"
+        },
+        {
+          "name": "timestamp",
+          "property_type": {
+            "type": "String"
+          },
+          "required": true,
+          "cardinality": "One"
+        },
+        {
+          "name": "operation",
+          "property_type": {
+            "type": "String"
+          },
+          "required": true,
+          "cardinality": "One"
+        },
+        {
+          "name": "model_id",
+          "property_type": {
+            "type": "String"
+          },
+          "required": true,
+          "cardinality": "One"
+        },
+        {
+          "name": "user_message",
+          "property_type": {
+            "type": "String"
+          },
+          "required": false,
+          "cardinality": "ZeroOrOne"
+        },
+        {
+          "name": "latency_ms",
+          "property_type": {
+            "type": "Number"
+          },
+          "required": false,
+          "cardinality": "ZeroOrOne"
+        },
+        {
+          "name": "input_tokens",
+          "property_type": {
+            "type": "Number"
+          },
+          "required": false,
+          "cardinality": "ZeroOrOne"
+        },
+        {
+          "name": "output_tokens",
+          "property_type": {
+            "type": "Number"
+          },
+          "required": false,
+          "cardinality": "ZeroOrOne"
+        }
+      ],
+      "constraints": [],
+      "metadata": {}
+    },
+    "ToolUse": {
+      "id": "ToolUse",
+      "label": "Tool Use",
+      "parent": null,
+      "properties": [
+        {
+          "name": "tool_name",
+          "property_type": {
+            "type": "String"
+          },
+          "required": true,
+          "cardinality": "One"
+        },
+        {
+          "name": "tool_use_id",
+          "property_type": {
+            "type": "String"
+          },
+          "required": true,
+          "cardinality": "One"
+        },
+        {
+          "name": "input_data",
+          "property_type": {
+            "type": "String"
+          },
+          "required": false,
+          "cardinality": "ZeroOrOne"
+        }
+      ],
+      "constraints": [],
+      "metadata": {}
+    },
+    "Patient": {
+      "id": "Patient",
+      "label": "Patient",
+      "parent": null,
+      "properties": [
+        {
+          "name": "patient_id",
+          "property_type": {
+            "type": "String"
+          },
+          "required": true,
+          "cardinality": "One"
+        },
+        {
+          "name": "name",
+          "property_type": {
+            "type": "String"
+          },
+          "required": false,
+          "cardinality": "ZeroOrOne"
+        }
+      ],
+      "constraints": [],
+      "metadata": {}
+    },
+    "Agent": {
+      "id": "Agent",
+      "label": "Agent",
+      "parent": null,
+      "properties": [
+        {
+          "name": "agent_id",
+          "property_type": {
+            "type": "String"
+          },
+          "required": true,
+          "cardinality": "One"
+        },
+        {
+          "name": "agent_type",
+          "property_type": {
+            "type": "String"
+          },
+          "required": false,
+          "cardinality": "ZeroOrOne"
+        },
+        {
+          "name": "arn",
+          "property_type": {
+            "type": "String"
+          },
+          "required": false,
+          "cardinality": "ZeroOrOne"
+        }
+      ],
+      "constraints": [],
+      "metadata": {}
+    }
+  },
+  "relation_types": {},
+  "rules": []
+}

@@ -1,0 +1,173 @@
+{
+  "namespace": "bedrock.healthcare",
+  "version": "1.0.0",
+  "entity_types": {
+    "BedrockRequest": {
+      "description": "A Bedrock API request/invocation",
+      "parent_type": null,
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "required": true,
+          "indexed": true,
+          "description": "Unique request identifier"
+        },
+        "timestamp": {
+          "type": "string",
+          "required": true,
+          "indexed": true,
+          "description": "Request timestamp"
+        },
+        "operation": {
+          "type": "string",
+          "required": true,
+          "indexed": true,
+          "description": "Bedrock operation type"
+        },
+        "model_id": {
+          "type": "string",
+          "required": true,
+          "indexed": true,
+          "description": "Model identifier"
+        },
+        "user_message": {
+          "type": "string",
+          "required": false,
+          "indexed": false,
+          "description": "User input message"
+        },
+        "latency_ms": {
+          "type": "number",
+          "required": false,
+          "indexed": false,
+          "description": "Request latency in milliseconds"
+        },
+        "input_tokens": {
+          "type": "number",
+          "required": false,
+          "indexed": false,
+          "description": "Number of input tokens"
+        },
+        "output_tokens": {
+          "type": "number",
+          "required": false,
+          "indexed": false,
+          "description": "Number of output tokens"
+        }
+      }
+    },
+    "ToolUse": {
+      "description": "A tool/function call made by the model",
+      "parent_type": null,
+      "properties": {
+        "tool_name": {
+          "type": "string",
+          "required": true,
+          "indexed": true,
+          "description": "Name of the tool called"
+        },
+        "tool_use_id": {
+          "type": "string",
+          "required": true,
+          "indexed": true,
+          "description": "Unique tool use identifier"
+        },
+        "input_data": {
+          "type": "string",
+          "required": false,
+          "indexed": false,
+          "description": "Tool input parameters (JSON string)"
+        }
+      }
+    },
+    "Patient": {
+      "description": "A patient referenced in the conversation",
+      "parent_type": null,
+      "properties": {
+        "patient_id": {
+          "type": "string",
+          "required": true,
+          "indexed": true,
+          "description": "Patient identifier"
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "indexed": true,
+          "description": "Patient name if available"
+        }
+      }
+    },
+    "Agent": {
+      "description": "An AI agent or user in the system",
+      "parent_type": null,
+      "properties": {
+        "agent_id": {
+          "type": "string",
+          "required": true,
+          "indexed": true,
+          "description": "Agent identifier"
+        },
+        "agent_type": {
+          "type": "string",
+          "required": false,
+          "indexed": true,
+          "description": "Type of agent (e.g., 'bedrock', 'user', 'system')"
+        },
+        "arn": {
+          "type": "string",
+          "required": false,
+          "indexed": false,
+          "description": "AWS IAM ARN if applicable"
+        }
+      }
+    }
+  },
+  "relation_types": {
+    "INVOKED_TOOL": {
+      "source_type": "BedrockRequest",
+      "target_type": "ToolUse",
+      "description": "Request invoked a specific tool",
+      "properties": {
+        "sequence": {
+          "type": "number",
+          "required": false,
+          "indexed": false,
+          "description": "Order of tool use in the conversation"
+        }
+      }
+    },
+    "REFERENCES_PATIENT_FROM_REQUEST": {
+      "source_type": "BedrockRequest",
+      "target_type": "Patient",
+      "description": "Request references a specific patient",
+      "properties": {}
+    },
+    "REFERENCES_PATIENT_FROM_TOOL": {
+      "source_type": "ToolUse",
+      "target_type": "Patient",
+      "description": "Tool use references a specific patient",
+      "properties": {}
+    },
+    "MADE_BY": {
+      "source_type": "BedrockRequest",
+      "target_type": "Agent",
+      "description": "Request was made by an agent or user",
+      "properties": {}
+    },
+    "FOLLOWED_BY": {
+      "source_type": "BedrockRequest",
+      "target_type": "BedrockRequest",
+      "description": "Sequential relationship between requests",
+      "properties": {
+        "time_delta_ms": {
+          "type": "number",
+          "required": false,
+          "indexed": false,
+          "description": "Time difference between requests"
+        }
+      }
+    }
+  },
+  "rules": []
+}

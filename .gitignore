@@ -20,3 +20,6 @@ vectadb/target/
 # Documentation builds
 docs/_build/
 .archive/docker-composes
+
+notes
+

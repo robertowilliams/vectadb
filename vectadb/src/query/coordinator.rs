@@ -268,9 +268,10 @@ impl QueryCoordinator {
                 // Collect target entities
                 for relation in relations {
                     if let Some(target) = self.surreal.get_entity(&relation.target_id).await? {
-                        if !visited.contains(&target.id) {
+                        let target_id_string = target.id_string();
+                        if !visited.contains(&target_id_string) {
                             result.push(target.clone());
-                            next_level.push(target.id);
+                            next_level.push(target_id_string);
                         }
                     }
                 }
@@ -331,9 +332,10 @@ impl QueryCoordinator {
                 // Collect source entities
                 for relation in relations {
                     if let Some(source) = self.surreal.get_entity(&relation.source_id).await? {
-                        if !visited.contains(&source.id) {
+                        let source_id_string = source.id_string();
+                        if !visited.contains(&source_id_string) {
                             result.push(source.clone());
-                            next_level.push(source.id);
+                            next_level.push(source_id_string);
                         }
                     }
                 }
@@ -447,11 +449,11 @@ impl QueryCoordinator {
         let mut result_map: HashMap<String, ScoredResult> = HashMap::new();
 
         for result in vector_results {
-            result_map.insert(result.entity.id.clone(), result);
+            result_map.insert(result.entity.id_string(), result);
         }
 
         for result in graph_results {
-            let entity_id = result.entity.id.clone();
+            let entity_id = result.entity.id_string();
             if let Some(existing) = result_map.get_mut(&entity_id) {
                 // Entity exists in both - mark as hybrid and average scores
                 existing.score = (existing.score + result.score) / 2.0;
@@ -473,12 +475,12 @@ impl QueryCoordinator {
     ) -> Vec<ScoredResult> {
         let graph_ids: HashSet<String> = graph_results
             .iter()
-            .map(|r| r.entity.id.clone())
+            .map(|r| r.entity.id_string())
             .collect();
 
         vector_results
             .into_iter()
-            .filter(|r| graph_ids.contains(&r.entity.id))
+            .filter(|r| graph_ids.contains(&r.entity.id_string()))
             .map(|mut r| {
                 r.source = ResultSource::Hybrid;
                 r.explanation = Some("Present in both vector and graph results".to_string());
@@ -502,18 +504,20 @@ impl QueryCoordinator {
         // Add vector ranks
         for (rank, result) in vector_results.iter().enumerate() {
             let rrf_score = 1.0 / (K + rank as f32 + 1.0);
-            scores.insert(result.entity.id.clone(), rrf_score);
-            entities.insert(result.entity.id.clone(), result.entity.clone());
+            let entity_id = result.entity.id_string();
+            scores.insert(entity_id.clone(), rrf_score);
+            entities.insert(entity_id, result.entity.clone());
         }
 
         // Add graph ranks
         for (rank, result) in graph_results.iter().enumerate() {
             let rrf_score = 1.0 / (K + rank as f32 + 1.0);
+            let entity_id = result.entity.id_string();
             scores
-                .entry(result.entity.id.clone())
+                .entry(entity_id.clone())
                 .and_modify(|s| *s += rrf_score)
                 .or_insert(rrf_score);
-            entities.insert(result.entity.id.clone(), result.entity.clone());
+            entities.insert(entity_id, result.entity.clone());
         }
 
         scores
@@ -535,13 +539,13 @@ impl QueryCoordinator {
     ) -> Vec<ScoredResult> {
         let graph_ids: HashSet<String> = graph_results
             .iter()
-            .map(|r| r.entity.id.clone())
+            .map(|r| r.entity.id_string())
             .collect();
 
         vector_results
             .into_iter()
             .map(|mut r| {
-                if graph_ids.contains(&r.entity.id) {
+                if graph_ids.contains(&r.entity.id_string()) {
                     r.source = ResultSource::Hybrid;
                     r.explanation =
                         Some("High similarity and graph connected".to_string());
@@ -559,13 +563,13 @@ impl QueryCoordinator {
     ) -> Vec<ScoredResult> {
         let vector_scores: HashMap<String, f32> = vector_results
             .into_iter()
-            .map(|r| (r.entity.id.clone(), r.score))
+            .map(|r| (r.entity.id_string(), r.score))
             .collect();
 
         graph_results
             .into_iter()
             .map(|mut r| {
-                if let Some(&vector_score) = vector_scores.get(&r.entity.id) {
+                if let Some(&vector_score) = vector_scores.get(&r.entity.id_string()) {
                     r.score = vector_score;
                     r.source = ResultSource::Hybrid;
                     r.explanation = Some("Graph connected with vector similarity".to_string());

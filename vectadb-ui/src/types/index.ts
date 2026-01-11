@@ -1,4 +1,5 @@
 // VectaDB TypeScript Types
+import type { SimulationNodeDatum } from 'd3'
 
 export interface Entity {
   id: string
@@ -141,7 +142,7 @@ export interface RecentActivity {
   timestamp: string
 }
 
-export interface GraphNode {
+export interface GraphNode extends SimulationNodeDatum {
   id: string
   label: string
   type: string

@@ -1,0 +1,137 @@
+{
+  "namespace": "bedrock.healthcare",
+  "version": "1.0.0",
+  "entity_types": {
+    "BedrockRequest": {
+      "description": "A Bedrock API request/invocation",
+      "parent_type": null,
+      "properties": [
+        {
+          "name": "request_id",
+          "property_type": "String"
+        },
+        {
+          "name": "timestamp",
+          "property_type": "String"
+        },
+        {
+          "name": "operation",
+          "property_type": "String"
+        },
+        {
+          "name": "model_id",
+          "property_type": "String"
+        },
+        {
+          "name": "user_message",
+          "property_type": "String"
+        },
+        {
+          "name": "latency_ms",
+          "property_type": "Number"
+        },
+        {
+          "name": "input_tokens",
+          "property_type": "Number"
+        },
+        {
+          "name": "output_tokens",
+          "property_type": "Number"
+        }
+      ]
+    },
+    "ToolUse": {
+      "description": "A tool/function call made by the model",
+      "parent_type": null,
+      "properties": [
+        {
+          "name": "tool_name",
+          "property_type": "String"
+        },
+        {
+          "name": "tool_use_id",
+          "property_type": "String"
+        },
+        {
+          "name": "input_data",
+          "property_type": "String"
+        }
+      ]
+    },
+    "Patient": {
+      "description": "A patient referenced in the conversation",
+      "parent_type": null,
+      "properties": [
+        {
+          "name": "patient_id",
+          "property_type": "String"
+        },
+        {
+          "name": "name",
+          "property_type": "String"
+        }
+      ]
+    },
+    "Agent": {
+      "description": "An AI agent or user in the system",
+      "parent_type": null,
+      "properties": [
+        {
+          "name": "agent_id",
+          "property_type": "String"
+        },
+        {
+          "name": "agent_type",
+          "property_type": "String"
+        },
+        {
+          "name": "arn",
+          "property_type": "String"
+        }
+      ]
+    }
+  },
+  "relation_types": {
+    "INVOKED_TOOL": {
+      "source_type": "BedrockRequest",
+      "target_type": "ToolUse",
+      "description": "Request invoked a specific tool",
+      "properties": [
+        {
+          "name": "sequence",
+          "property_type": "Number"
+        }
+      ]
+    },
+    "REFERENCES_PATIENT_FROM_REQUEST": {
+      "source_type": "BedrockRequest",
+      "target_type": "Patient",
+      "description": "Request references a specific patient",
+      "properties": []
+    },
+    "REFERENCES_PATIENT_FROM_TOOL": {
+      "source_type": "ToolUse",
+      "target_type": "Patient",
+      "description": "Tool use references a specific patient",
+      "properties": []
+    },
+    "MADE_BY": {
+      "source_type": "BedrockRequest",
+      "target_type": "Agent",
+      "description": "Request was made by an agent or user",
+      "properties": []
+    },
+    "FOLLOWED_BY": {
+      "source_type": "BedrockRequest",
+      "target_type": "BedrockRequest",
+      "description": "Sequential relationship between requests",
+      "properties": [
+        {
+          "name": "time_delta_ms",
+          "property_type": "Number"
+        }
+      ]
+    }
+  },
+  "rules": []
+}
