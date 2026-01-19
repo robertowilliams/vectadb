@@ -1,0 +1,21 @@
+#V2
+SELECT * FROM ontology_schema;
+CREATE ontology_schema:test SET namespace = "test", version = "1.0", schema_json = "{}", created_at = time::now();
+CREATE type::thing("ontology_schema", "bedrock.healthcare") SET namespace = "bedrock.healthcare", version = "1.0", schema_json = "{}", created_at = time::now();
+DELETE FROM ontology_schema;
+SELECT * FROM ontology_schema;
+SELECT namespace, version, created_at FROM ontology_schema;
+SELECT count() FROM entity GROUP ALL;
+SELECT entity_type, count() FROM entity GROUP BY entity_type;
+CREATE entity:test_manual SET entity_type = "BedrockRequest", properties = {"request_id": "manual-test"}, embedding = NONE, metadata = {};
+SELECT * FROM entity:test_manual;
+CREATE entity:test_with_defaults CONTENT {  entity_type: "BedrockRequest",  properties: {"request_id": "test-with-defaults"},  embedding: NONE,  metadata: {}};
+SELECT * FROM entity:test_with_defaults;
+CREATE entity:test_value_only SET entity_type = "BedrockRequest", properties = {"request_id": "value-test"};
+SELECT * FROM entity:test_value_only;
+SELECT count() FROM entity GROUP ALL;
+SELECT entity_type, count() FROM entity GROUP BY entity_type;
+SELECT id FROM entity WHERE entity_type = "Agent" LIMIT 1;
+SELECT id FROM entity WHERE entity_type = "BedrockRequest" LIMIT 1;
+SELECT id.id, entity_type FROM entity LIMIT 3;
+SELECT * FROM entity LIMIT 2;

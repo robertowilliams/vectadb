@@ -1,0 +1,25 @@
+# HuggingFace Inference API Plugin Configuration
+#
+# Usage:
+#   1. Get your API token from: https://huggingface.co/settings/tokens
+#   2. Set environment variable: export HF_API_KEY="hf_..."
+#   3. Or replace ${HF_API_KEY} below with your token
+#
+# Popular models:
+#   - sentence-transformers/all-MiniLM-L6-v2 (384 dim) - Fast, good quality
+#   - sentence-transformers/all-mpnet-base-v2 (768 dim) - Best quality
+#   - BAAI/bge-small-en-v1.5 (384 dim) - Good for retrieval
+#   - BAAI/bge-base-en-v1.5 (768 dim) - Better quality
+#
+# Pricing:
+#   - Free tier: 30,000 characters/month
+#   - Pro: $9/month for unlimited inference
+
+name: "huggingface"
+provider: "huggingface"
+api_key: "${HF_API_KEY}"
+model: "sentence-transformers/all-MiniLM-L6-v2"
+base_url: "https://api-inference.huggingface.co"
+dimension: 384
+batch_size: 32
+timeout_secs: 60

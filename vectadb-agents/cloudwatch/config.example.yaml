@@ -1,0 +1,86 @@
+# VectaDB CloudWatch Agent Configuration Example
+
+# AWS CloudWatch configuration
+aws:
+  # AWS region where your CloudWatch logs are located
+  region: "us-east-1"
+
+  # Optional: AWS profile name (uses default credentials if not specified)
+  # profile: "my-profile"
+
+# VectaDB API configuration
+vectadb:
+  # VectaDB API endpoint
+  endpoint: "http://localhost:8080"
+
+  # Optional: API key for authentication (future feature)
+  # api_key: "your-api-key"
+
+  # Batch size for bulk ingestion (default: 100)
+  batch_size: 100
+
+  # Request timeout in seconds (default: 30)
+  timeout_secs: 30
+
+# Log groups to monitor
+log_groups:
+  # Example 1: LangChain agent on Lambda with built-in parser
+  - name: "/aws/lambda/my-langchain-agent"
+    agent_id: "langchain-agent-001"
+    parsers:
+      - name: "langchain"
+        type: "langchain"
+        priority: 10
+    # Optional: CloudWatch filter pattern to reduce log volume
+    # filter_pattern: "[level=ERROR]"
+
+  # Example 2: LlamaIndex service with built-in parser
+  - name: "/aws/ecs/llamaindex-service"
+    agent_id: "llamaindex-service-001"
+    parsers:
+      - name: "llamaindex"
+        type: "llamaindex"
+        priority: 10
+
+  # Example 3: Custom JSON logs
+  - name: "/aws/lambda/custom-agent"
+    agent_id: "custom-agent-001"
+    parsers:
+      - name: "json"
+        type: "json"
+        priority: 5
+        event_type: "custom_event"
+
+  # Example 4: Generic logs with regex parsing
+  - name: "/aws/lambda/generic-service"
+    parsers:
+      - name: "error_parser"
+        type: "regex"
+        pattern: "(?i)ERROR:.*?(?P<error_message>.*?)(?:in|at)\\s*(?P<location>.*)"
+        field_mapping:
+          error_message: "message"
+          location: "error_location"
+        event_type: "error"
+        priority: 5
+
+      # Fallback parser for other logs
+      - name: "info_parser"
+        type: "regex"
+        pattern: "(?P<message>.*)"
+        event_type: "info"
+        priority: 100
+
+# Agent behavior settings
+agent:
+  # Polling interval in seconds (default: 10)
+  poll_interval_secs: 10
+
+  # Lookback window in seconds for first poll (default: 300 = 5 minutes)
+  # On first run, agent will fetch logs from the last N seconds
+  lookback_secs: 300
+
+  # Auto-create traces from session_id if not exists (default: true)
+  auto_create_traces: true
+
+  # Generate embeddings for semantic search (default: true)
+  generate_embeddings: true

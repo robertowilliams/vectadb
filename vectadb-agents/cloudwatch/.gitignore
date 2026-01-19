@@ -1,0 +1,22 @@
+# Rust build artifacts
+target/
+debug/
+release/
+
+# Cargo lock for binaries (keep it for applications)
+# Cargo.lock
+
+# Environment files
+.env
+*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

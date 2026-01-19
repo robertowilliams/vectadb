@@ -1,0 +1,53 @@
+# CloudWatch Agent Configuration for AWS Bedrock Agent Logs
+# This configuration is optimized for parsing Bedrock model invocation logs
+
+aws:
+  region: "us-east-1"
+
+vectadb:
+  endpoint: "http://localhost:8080"
+  api_key: null
+  batch_size: 100
+  timeout_secs: 30
+
+log_groups:
+  # Bedrock Agent Invocation Logs
+  - name: "/aws/bedrock/agent/invocations"
+    agent_id: "bedrock-healthcare-assistant"
+
+    parsers:
+      # Parser for successful Bedrock invocations (JSON format)
+      - name: "bedrock_invocation"
+        type: "json"
+        priority: 10
+        event_type: "bedrock_invocation"
+        field_mapping:
+          requestId: "request_id"
+          operation: "operation"
+          modelId: "model_id"
+          timestamp: "bedrock_timestamp"
+          accountId: "account_id"
+          region: "aws_region"
+
+      # Parser for Bedrock errors (ThrottlingException, etc.)
+      - name: "bedrock_error"
+        type: "json"
+        priority: 5
+        event_type: "bedrock_error"
+        field_mapping:
+          requestId: "request_id"
+          errorCode: "error_code"
+          timestamp: "bedrock_timestamp"
+
+agent:
+  # Poll every 10 seconds
+  poll_interval_secs: 10
+
+  # Look back 5 minutes on first poll
+  lookback_secs: 300
+
+  # Automatically create traces when session/request IDs are detected
+  auto_create_traces: true
+
+  # Generate embeddings for log content
+  generate_embeddings: true

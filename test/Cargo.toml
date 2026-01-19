@@ -1,0 +1,28 @@
+[package]
+name = "vectadb-tests"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "bedrock_test"
+path = "bedrock_test.rs"
+
+[[bin]]
+name = "database_verification"
+path = "database_verification.rs"
+
+[[bin]]
+name = "graph_database_test"
+path = "graph_database_test.rs"
+
+[[bin]]
+name = "bedrock_graph_ingestion"
+path = "bedrock_graph_ingestion.rs"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.12", features = ["json"] }
+base64 = "0.22"
+rand = "0.8"

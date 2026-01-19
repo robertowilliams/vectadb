@@ -1,0 +1,27 @@
+namespace: demo.simple
+version: "1.0.0"
+
+entity_types:
+  TestNode:
+    description: "A simple test node"
+    parent_type: null
+    properties:
+      name:
+        type: string
+        required: true
+        indexed: true
+        description: "Node name"
+      index:
+        type: number
+        required: false
+        indexed: false
+        description: "Node index"
+
+relation_types:
+  CONNECTED_TO:
+    source_type: TestNode
+    target_type: TestNode
+    description: "Connection between nodes"
+    properties: {}
+
+rules: []

@@ -1,0 +1,444 @@
+# VectaDB Agent Ontology
+# Defines entity types and relations for LLM agent systems
+
+namespace: "http://vectadb.com/ontology/agents/v1"
+version: "1.0.0"
+
+entity_types:
+  Agent:
+    id: "Agent"
+    label: "Agent"
+    parent: null
+    properties:
+      - name: "id"
+        property_type:
+          type: "String"
+        required: true
+        cardinality: "One"
+        description: "Unique identifier"
+
+      - name: "name"
+        property_type:
+          type: "String"
+        required: true
+        cardinality: "One"
+        description: "Agent name"
+
+      - name: "created_at"
+        property_type:
+          type: "DateTime"
+        required: true
+        cardinality: "One"
+        description: "Creation timestamp"
+
+      - name: "updated_at"
+        property_type:
+          type: "DateTime"
+        required: false
+        cardinality: "ZeroOrOne"
+        description: "Last update timestamp"
+
+      - name: "capabilities"
+        property_type:
+          type: "Array"
+          config:
+            type: "String"
+        required: false
+        cardinality: "Many"
+        description: "Agent capabilities"
+
+      - name: "metadata"
+        property_type:
+          type: "Object"
+        required: false
+        cardinality: "ZeroOrOne"
+        description: "Additional metadata"
+
+    constraints: []
+    metadata: null
+
+  LLMAgent:
+    id: "LLMAgent"
+    label: "LLM-Powered Agent"
+    parent: "Agent"
+    properties:
+      - name: "model_name"
+        property_type:
+          type: "String"
+        required: true
+        cardinality: "One"
+        description: "LLM model identifier (e.g., gpt-4, claude-3)"
+
+      - name: "temperature"
+        property_type:
+          type: "Number"
+        required: false
+        cardinality: "ZeroOrOne"
+        description: "Sampling temperature"
+
+      - name: "max_tokens"
+        property_type:
+          type: "Number"
+        required: false
+        cardinality: "ZeroOrOne"
+        description: "Maximum tokens per response"
+
+      - name: "system_prompt"
+        property_type:
+          type: "String"
+        required: false
+        cardinality: "ZeroOrOne"
+        description: "System prompt/instructions"
+
+    constraints:
+      - type: "ValueRange"
+        config:
+          min: 0.0
+          max: 2.0
+    metadata: null
+
+  HumanAgent:
+    id: "HumanAgent"
+    label: "Human Agent"
+    parent: "Agent"
+    properties:
+      - name: "email"
+        property_type:
+          type: "String"
+        required: true
+        cardinality: "One"
+        description: "Email address"
+
+      - name: "role"
+        property_type:
+          type: "String"
+        required: false
+        cardinality: "ZeroOrOne"
+        description: "User role (e.g., admin, user, reviewer)"
+
+    constraints:
+      - type: "Pattern"
+        config: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+    metadata: null
+
+  Task:
+    id: "Task"
+    label: "Task"
+    parent: null
+    properties:
+      - name: "id"
+        property_type:
+          type: "String"
+        required: true
+        cardinality: "One"
+        description: "Unique identifier"
+
+      - name: "name"
+        property_type:
+          type: "String"
+        required: true
+        cardinality: "One"
+        description: "Task name"
+
+      - name: "description"
+        property_type:
+          type: "String"
+        required: false
+        cardinality: "ZeroOrOne"
+        description: "Task description"
+
+      - name: "status"
+        property_type:
+          type: "String"
+        required: true
+        cardinality: "One"
+        description: "Task status"
+
+      - name: "priority"
+        property_type:
+          type: "Number"
+        required: false
+        cardinality: "ZeroOrOne"
+        description: "Task priority (1-10)"
+
+      - name: "created_at"
+        property_type:
+          type: "DateTime"
+        required: true
+        cardinality: "One"
+        description: "Creation timestamp"
+
+      - name: "description_embedding"
+        property_type:
+          type: "Embedding"
+        required: false
+        cardinality: "ZeroOrOne"
+        description: "Vector embedding of description"
+
+      - name: "metadata"
+        property_type:
+          type: "Object"
+        required: false
+        cardinality: "ZeroOrOne"
+        description: "Additional metadata"
+
+    constraints:
+      - type: "Enum"
+        config:
+          - "pending"
+          - "in_progress"
+          - "completed"
+          - "failed"
+          - "cancelled"
+    metadata: null
+
+  Log:
+    id: "Log"
+    label: "Log Entry"
+    parent: null
+    properties:
+      - name: "id"
+        property_type:
+          type: "String"
+        required: true
+        cardinality: "One"
+        description: "Unique identifier"
+
+      - name: "level"
+        property_type:
+          type: "String"
+        required: true
+        cardinality: "One"
+        description: "Log level"
+
+      - name: "message"
+        property_type:
+          type: "String"
+        required: true
+        cardinality: "One"
+        description: "Log message"
+
+      - name: "timestamp"
+        property_type:
+          type: "DateTime"
+        required: true
+        cardinality: "One"
+        description: "Log timestamp"
+
+      - name: "metadata"
+        property_type:
+          type: "Object"
+        required: false
+        cardinality: "ZeroOrOne"
+        description: "Additional log data"
+
+    constraints:
+      - type: "Enum"
+        config:
+          - "DEBUG"
+          - "INFO"
+          - "WARN"
+          - "ERROR"
+          - "FATAL"
+    metadata: null
+
+  Thought:
+    id: "Thought"
+    label: "Agent Thought (Chain-of-Thought)"
+    parent: null
+    properties:
+      - name: "id"
+        property_type:
+          type: "String"
+        required: true
+        cardinality: "One"
+        description: "Unique identifier"
+
+      - name: "content"
+        property_type:
+          type: "String"
+        required: true
+        cardinality: "One"
+        description: "Thought content"
+
+      - name: "reasoning_step"
+        property_type:
+          type: "Number"
+        required: false
+        cardinality: "ZeroOrOne"
+        description: "Step number in reasoning chain"
+
+      - name: "timestamp"
+        property_type:
+          type: "DateTime"
+        required: true
+        cardinality: "One"
+        description: "Thought timestamp"
+
+      - name: "content_embedding"
+        property_type:
+          type: "Embedding"
+        required: false
+        cardinality: "ZeroOrOne"
+        description: "Vector embedding of thought content"
+
+    constraints: []
+    metadata: null
+
+relation_types:
+  executes:
+    id: "executes"
+    label: "executes"
+    domain: "Agent"
+    range: "Task"
+    inverse: "executed_by"
+    transitive: false
+    symmetric: false
+    functional: false
+    reflexive: false
+    metadata: null
+
+  executed_by:
+    id: "executed_by"
+    label: "executed by"
+    domain: "Task"
+    range: "Agent"
+    inverse: "executes"
+    transitive: false
+    symmetric: false
+    functional: true  # A task is executed by only one agent
+    reflexive: false
+    metadata: null
+
+  has_subtask:
+    id: "has_subtask"
+    label: "has subtask"
+    domain: "Task"
+    range: "Task"
+    inverse: "subtask_of"
+    transitive: true  # If A has B and B has C, then A has C
+    symmetric: false
+    functional: false
+    reflexive: false
+    metadata: null
+
+  subtask_of:
+    id: "subtask_of"
+    label: "subtask of"
+    domain: "Task"
+    range: "Task"
+    inverse: "has_subtask"
+    transitive: true
+    symmetric: false
+    functional: false
+    reflexive: false
+    metadata: null
+
+  depends_on:
+    id: "depends_on"
+    label: "depends on"
+    domain: "Task"
+    range: "Task"
+    inverse: null
+    transitive: true  # Task dependencies are transitive
+    symmetric: false
+    functional: false
+    reflexive: false
+    metadata: null
+
+  collaborates_with:
+    id: "collaborates_with"
+    label: "collaborates with"
+    domain: "Agent"
+    range: "Agent"
+    inverse: null  # Symmetric, so inverse is itself
+    transitive: false
+    symmetric: true  # If A collaborates with B, then B collaborates with A
+    functional: false
+    reflexive: false
+    metadata: null
+
+  generated:
+    id: "generated"
+    label: "generated"
+    domain: "Agent"
+    range: "Thought"
+    inverse: "generated_by"
+    transitive: false
+    symmetric: false
+    functional: false
+    reflexive: false
+    metadata: null
+
+  generated_by:
+    id: "generated_by"
+    label: "generated by"
+    domain: "Thought"
+    range: "Agent"
+    inverse: "generated"
+    transitive: false
+    symmetric: false
+    functional: true  # A thought is generated by one agent
+    reflexive: false
+    metadata: null
+
+  logged_for:
+    id: "logged_for"
+    label: "logged for"
+    domain: "Log"
+    range: "Agent"
+    inverse: "has_log"
+    transitive: false
+    symmetric: false
+    functional: true
+    reflexive: false
+    metadata: null
+
+  has_log:
+    id: "has_log"
+    label: "has log"
+    domain: "Agent"
+    range: "Log"
+    inverse: "logged_for"
+    transitive: false
+    symmetric: false
+    functional: false
+    reflexive: false
+    metadata: null
+
+rules:
+  - id: "agent_hierarchy"
+    rule_type: "SubClassOf"
+    description: "LLMAgent and HumanAgent are subtypes of Agent"
+    conditions: []
+    conclusion:
+      subject: "LLMAgent"
+      predicate: "subClassOf"
+      object: "Agent"
+
+  - id: "task_transitivity"
+    rule_type: "PropertyChain"
+    description: "If A has_subtask B and B has_subtask C, then A has_subtask C"
+    conditions:
+      - subject: "?x"
+        predicate: "has_subtask"
+        object: "?y"
+      - subject: "?y"
+        predicate: "has_subtask"
+        object: "?z"
+    conclusion:
+      subject: "?x"
+      predicate: "has_subtask"
+      object: "?z"
+
+  - id: "collaboration_symmetry"
+    rule_type: "Custom"
+    description: "If A collaborates_with B, then B collaborates_with A"
+    conditions:
+      - subject: "?a"
+        predicate: "collaborates_with"
+        object: "?b"
+    conclusion:
+      subject: "?b"
+      predicate: "collaborates_with"
+      object: "?a"

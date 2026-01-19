@@ -1,0 +1,5 @@
+#V2
+INFO FOR DB;
+CREATE entity:test_direct SET   entity_type = "Agent",  properties = {"agent_id": "direct_test"},  created_at = time::now(),  updated_at = time::now(),  metadata = {};
+SELECT * FROM entity LIMIT 5;
+SELECT * FROM entity;

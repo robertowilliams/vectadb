@@ -1,0 +1,33 @@
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Rust
+vectadb/target/
+**/*.rs.bk
+*.pdb
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+
+# Documentation builds
+docs/_build/
+.archive/docker-composes
+
+notes
+documents/
+preprint.pdf
+
+*.tex
+*.txt
+*.docx
+*.doc
+
+archive

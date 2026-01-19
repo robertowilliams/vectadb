@@ -1,0 +1,15 @@
+# Synthetic API Embedding Plugin Configuration (OpenAI-compatible)
+#
+# Using Synthetic API with nomic-embed model via OpenAI-compatible endpoint
+#
+# Models available:
+#   - hf:nomic-ai/nomic-embed-text-v1.5 (768 dimensions)
+
+name: "openai"
+provider: "openai"
+api_key: "${OPENAI_API_KEY}"
+model: "hf:nomic-ai/nomic-embed-text-v1.5"
+base_url: "https://api.synthetic.new/openai/v1"
+dimension: 768
+batch_size: 100
+timeout_secs: 60
