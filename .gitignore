@@ -31,3 +31,14 @@ preprint.pdf
 *.doc
 
 archive
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
