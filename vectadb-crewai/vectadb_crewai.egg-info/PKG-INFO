@@ -1,0 +1,257 @@
+Metadata-Version: 2.4
+Name: vectadb-crewai
+Version: 0.1.0
+Summary: VectaDB audit and observability integration for CrewAI
+Author-email: Roberto Williams Batista <robertobatista@ieee.org>
+License: Apache-2.0
+Project-URL: Homepage, https://github.com/robertowilliams/VectaDB
+Project-URL: Repository, https://github.com/robertowilliams/VectaDB
+Project-URL: Issues, https://github.com/robertowilliams/VectaDB/issues
+Keywords: vectadb,crewai,audit,observability,llm,agents
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: crewai>=0.80.0
+Requires-Dist: langchain-core>=0.3.0
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: python-dotenv>=1.0.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.23.0; extra == "dev"
+Requires-Dist: pytest-mock>=3.14.0; extra == "dev"
+Requires-Dist: respx>=0.21.0; extra == "dev"
+
+# vectadb-crewai
+
+**Audit and observability integration for CrewAI agents — powered by [VectaDB](https://github.com/robertowilliams/VectaDB).**
+
+This package instruments CrewAI crews with full audit tracing, capturing every LLM call, tool use, agent action, and task lifecycle event as typed, searchable, provenance-linked records in VectaDB.
+
+---
+
+## Why
+
+CrewAI agents are powerful but opaque. When something goes wrong — a hallucination, a bad tool call, a policy violation — you need to answer:
+
+- **What prompt produced that output?**
+- **Which tool was called with what input?**
+- **Was a retrieval step involved? What documents were retrieved?**
+- **Can I find similar incidents from previous runs?**
+
+Standard logging can't answer these questions semantically. VectaDB can — it stores every event as a typed entity in a hybrid vector + graph store, enabling both structured lineage queries and semantic similarity search over your audit trail.
+
+---
+
+## Architecture
+
+```
+CrewAI Crew
+  └── Agent (role: "Researcher")
+        ├── LangChain executor
+        │     ├── on_llm_start / on_llm_end   ──→ VectaDBCallbackHandler
+        │     ├── on_tool_start / on_tool_end  ──→ VectaDBCallbackHandler
+        │     └── on_agent_action              ──→ VectaDBCallbackHandler
+        └── step_callback / task_callback      ──→ VectaDBTracer (native)
+                                                        │
+                                              POST /api/v1/events/batch
+                                                        │
+                                                  VectaDB REST API
+                                                  (SurrealDB + Qdrant)
+```
+
+Each event is persisted as a typed entity in VectaDB with:
+- A `session_id` linking all events in a crew run
+- A `trace_id` linking all events for a single agent
+- Timestamps for latency analysis
+- Optional vector embeddings for semantic search
+
+---
+
+## Installation
+
+```bash
+pip install vectadb-crewai
+```
+
+Or from source inside the VectaDB repo:
+
+```bash
+cd vectadb3/vectadb-crewai
+pip install -e ".[dev]"
+```
+
+**Requirements:** Python 3.10+, VectaDB running locally (see `docker-compose.yml` in the repo root).
+
+---
+
+## Quickstart
+
+```python
+from crewai import Agent, Crew, Task
+from vectadb_crewai import VectaDBTracer
+
+# Define your agents and tasks as normal
+researcher = Agent(
+    role="Senior Research Analyst",
+    goal="Find accurate information on the given topic",
+    backstory="Expert researcher with deep AI knowledge.",
+    verbose=True,
+)
+
+task = Task(
+    description="Research {topic} and summarise the top 3 recent developments.",
+    expected_output="A research brief with findings and sources.",
+    agent=researcher,
+)
+
+crew = Crew(agents=[researcher], tasks=[task], verbose=True)
+
+# Wrap kickoff with the tracer — one line change
+tracer = VectaDBTracer(vectadb_url="http://localhost:8080", crew_name="my_crew")
+result = tracer.kickoff(crew, inputs={"topic": "AI regulation"})
+
+# The session ID is your handle to the audit trail
+print(f"Session: {tracer.session_id}")
+```
+
+That's it. VectaDB now holds a complete audit trail for the run.
+
+---
+
+## Querying the audit trail
+
+After a run, use VectaDB's REST API to inspect events:
+
+```bash
+# All events for a session
+curl "http://localhost:8080/api/v1/events?session_id=<session_id>"
+
+# Semantic search: find similar tool errors
+curl -X POST http://localhost:8080/api/v1/query/hybrid \
+  -H "Content-Type: application/json" \
+  -d '{"vector_query": "tool call error failure", "session_id": "<session_id>", "limit": 5}'
+
+# Provenance: trace all events for a specific agent
+curl "http://localhost:8080/api/v1/events?trace_id=<trace_id>"
+```
+
+---
+
+## Configuration
+
+### VectaDBTracer parameters
+
+| Parameter | Default | Description |
+|---|---|---|
+| `vectadb_url` | `http://localhost:8080` | VectaDB REST API base URL |
+| `api_key` | `None` | Optional X-API-Key header |
+| `crew_name` | `"default_crew"` | Label stored in all events |
+| `batch_size` | `100` | Events per bulk POST |
+| `generate_embeddings` | `True` | Ask VectaDB to vectorise events |
+| `auto_create_traces` | `True` | Auto-create trace records |
+| `flush_on_error` | `True` | Flush events even if crew raises |
+| `fail_silently` | `True` | Don't crash crew on VectaDB errors |
+
+### Environment variables (via `create_tracer_from_env()`)
+
+| Variable | Default |
+|---|---|
+| `VECTADB_URL` | `http://localhost:8080` |
+| `VECTADB_API_KEY` | _(none)_ |
+| `VECTADB_CREW_NAME` | `my_crew` |
+| `VECTADB_FAIL_SILENT` | `true` |
+
+```python
+from vectadb_crewai import create_tracer_from_env
+tracer = create_tracer_from_env()
+result = tracer.kickoff(crew, inputs={...})
+```
+
+---
+
+## Usage patterns
+
+### Context manager
+
+```python
+tracer = VectaDBTracer(vectadb_url="http://localhost:8080")
+
+with tracer:
+    tracer.instrument(crew)           # attach callbacks
+    result = crew.kickoff(inputs={})  # run normally
+    tracer.flush(result=result)       # explicit flush inside with-block
+```
+
+### Async kickoff
+
+```python
+tracer = VectaDBTracer(vectadb_url="http://localhost:8080")
+tracer.instrument(crew)
+
+result = await crew.kickoff_async(inputs={})
+tracer.flush(result=result)
+```
+
+### Using the async client directly
+
+```python
+from vectadb_crewai import VectaDBClient, VectaDBEvent
+
+async with VectaDBClient("http://localhost:8080") as client:
+    health = await client.health_check()
+    print(health.status)  # "healthy"
+
+    event = VectaDBEvent(
+        event_type="custom_event",
+        session_id="my-session",
+        properties={"note": "manual audit entry"},
+    )
+    response = await client.ingest_event(event)
+    print(response.event_id)
+```
+
+---
+
+## Event types captured
+
+| Event type | Trigger |
+|---|---|
+| `crew_start` / `crew_end` / `crew_error` | Crew.kickoff() lifecycle |
+| `agent_start` / `agent_end` | Per-agent lifecycle |
+| `agent_action` | Each ReAct thought/action/observation step |
+| `task_start` / `task_end` / `task_error` | Per-task lifecycle |
+| `llm_start` / `llm_end` / `llm_error` | Every LLM API call |
+| `tool_start` / `tool_end` / `tool_error` | Every tool invocation |
+| `chain_start` / `chain_end` / `chain_error` | LangChain sub-chains |
+| `retrieval_start` / `retrieval_end` | RAG retrieval steps |
+
+---
+
+## Running tests
+
+```bash
+pip install -e ".[dev]"
+pytest tests/ -v
+```
+
+---
+
+## Related
+
+- [VectaDB paper](https://arxiv.org/abs/...) — the research behind this project
+- [VectaDB repo](https://github.com/robertowilliams/VectaDB)
+- [vectadb-agents/cloudwatch](../vectadb-agents/cloudwatch) — CloudWatch log ingestion agent
+
+---
+
+## License
+
+Apache 2.0 — see [LICENSE](../../LICENSE).
