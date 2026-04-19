@@ -223,22 +223,6 @@ pub struct ListEntitiesResponse {
     pub total: usize,
 }
 
-/// Search entities request — filter by entity_type and optional property values
-#[derive(Debug, Serialize, Deserialize)]
-pub struct SearchEntitiesRequest {
-    /// Required: entity type to search within (e.g. "ChatMessage")
-    pub entity_type: String,
-
-    /// Optional: property key-value pairs that must match exactly
-    /// (e.g. {"session_id": "conv-abc"})
-    #[serde(default)]
-    pub filter: HashMap<String, JsonValue>,
-
-    /// Optional: maximum number of results to return (default: 1000)
-    #[serde(default)]
-    pub limit: Option<usize>,
-}
-
 // ============================================================================
 // Relation CRUD
 // ============================================================================
