@@ -1,0 +1,88 @@
+# VectaDB LogFlyer — Example Configuration
+#
+# Copy this to config.yaml and fill in your values.
+# Override any field with env vars: LOGFLYER_LLM__BASE_URL, etc.
+
+# ──────────────────────────────────────────────────────────────
+# LLM server (any OpenAI-compatible endpoint)
+# ──────────────────────────────────────────────────────────────
+llm:
+  # Base URL of the OpenAI-compatible server (no trailing slash)
+  # Examples:
+  #   Ollama local:  http://localhost:11434
+  #   vLLM:          http://localhost:8000
+  #   LM Studio:     http://localhost:1234
+  #   OpenAI:        https://api.openai.com
+  #   Anthropic:     https://api.anthropic.com/v1  (with compatible wrapper)
+  base_url: "http://localhost:11434"
+
+  # API key (leave empty for local servers that don't require one)
+  api_key: ""
+
+  # Model name as the server expects it
+  # Examples: "llama3", "mistral", "gpt-4o", "claude-3-5-sonnet-20241022"
+  model: "llama3"
+
+  # Maximum tokens in the LLM response (classification output)
+  max_tokens: 2048
+
+  # Temperature: 0.0 = deterministic (recommended for classification)
+  temperature: 0.0
+
+  # Request timeout in seconds
+  timeout_secs: 60
+
+  # Whether to request JSON mode from the server (supported by most modern servers)
+  # Disable if your server returns an error for response_format: json_object
+  json_mode: true
+
+# ──────────────────────────────────────────────────────────────
+# VectaDB API
+# ──────────────────────────────────────────────────────────────
+vectadb:
+  endpoint: "http://localhost:8080"
+  # api_key: "your-key"          # optional
+  batch_size: 100
+  timeout_secs: 30
+
+# ──────────────────────────────────────────────────────────────
+# Log files to monitor
+# ──────────────────────────────────────────────────────────────
+log_files:
+  # LangChain agent writing JSON logs
+  - path: "/var/log/myapp/langchain.log"
+    agent_id: "langchain-agent-prod"
+    # session_id: "fixed-session"   # Optional — extracted from log if absent
+
+  # AG2 multi-agent conversation log
+  - path: "/tmp/ag2_conversation.log"
+    agent_id: "ag2-orchestrator"
+
+  # Generic Python service — logflyer will use the LLM to find agentic lines
+  - path: "/var/log/myapp/app.log"
+    agent_id: "myapp-backend"
+
+# ──────────────────────────────────────────────────────────────
+# Agent behavior
+# ──────────────────────────────────────────────────────────────
+agent:
+  # How often to poll log files for new lines (seconds)
+  poll_interval_secs: 5
+
+  # Lines sent to the LLM in a single classification request.
+  # Larger batches = fewer API calls but slower feedback loop.
+  classification_batch_size: 30
+
+  # On first startup, read the last N lines from each file.
+  # Set to 0 to start tailing from the current end (no history).
+  lookback_lines: 100
+
+  # Ask VectaDB to generate vector embeddings for semantic search
+  generate_embeddings: true
+
+  # Ask VectaDB to auto-create trace records from session_id
+  auto_create_traces: true
+
+  # If true, log errors but never crash on LLM or VectaDB failures.
+  # The poll loop will continue and retry on the next cycle.
+  fail_silently: true
