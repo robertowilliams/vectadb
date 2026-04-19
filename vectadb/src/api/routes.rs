@@ -36,6 +36,7 @@ pub fn create_router_with_state(state: AppState) -> Router {
 
         // Entity CRUD
         .route("/api/v1/entities", post(handlers::create_entity))
+        .route("/api/v1/entities/search", post(handlers::search_entities))
         .route("/api/v1/entities/:id", get(handlers::get_entity))
         .route("/api/v1/entities/:id", put(handlers::update_entity))
         .route("/api/v1/entities/:id", delete(handlers::delete_entity))
