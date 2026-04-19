@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vectadb-langchain"
+version = "0.1.0"
+description = "VectaDB audit and observability integration for LangChain"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Roberto Williams Batista" }]
+requires-python = ">=3.10"
+
+dependencies = [
+    "langchain-core>=0.3.0",
+    "httpx>=0.24.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+langgraph = ["langgraph>=0.1.0"]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "pytest-mock>=3.10",
+    "respx>=0.20",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["vectadb_langchain*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
