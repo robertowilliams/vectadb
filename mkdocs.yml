@@ -33,6 +33,9 @@ theme:
   icon:
     repo: fontawesome/brands/github
 
+extra_javascript:
+  - javascripts/particles.js
+
 extra_css:
   - stylesheets/vectadb.css
 
