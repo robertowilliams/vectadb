@@ -1,0 +1,105 @@
+/* VectaDB brand colors — matching vectadb.base44.app */
+
+/* ── Light mode ── */
+:root {
+  --md-primary-fg-color:        #00a8cc;
+  --md-primary-fg-color--light: #00d4ff;
+  --md-primary-fg-color--dark:  #0080a8;
+  --md-primary-bg-color:        #ffffff;
+  --md-accent-fg-color:         #dc143c;
+  --md-accent-fg-color--light:  #ff1493;
+  --md-typeset-a-color:         #00a8cc;
+}
+
+/* ── Dark mode (slate scheme) ── */
+[data-md-color-scheme="slate"] {
+  /* Background layers — near-black like the site */
+  --md-default-bg-color:        #0a0a0a;
+  --md-default-bg-color--light: #0f0f0f;
+  --md-default-bg-color--lighter: #141414;
+  --md-default-bg-color--lightest: #1a1a1a;
+
+  /* Primary cyan */
+  --md-primary-fg-color:        #00d4ff;
+  --md-primary-fg-color--light: #00d4ff;
+  --md-primary-fg-color--dark:  #0080a8;
+  --md-primary-bg-color:        #0a0a0a;
+
+  /* Accent crimson */
+  --md-accent-fg-color:         #dc143c;
+
+  /* Text — cream/beige like the site */
+  --md-default-fg-color:        #f5f5dc;
+  --md-default-fg-color--light: rgba(245, 245, 220, 0.75);
+  --md-default-fg-color--lighter: rgba(245, 245, 220, 0.45);
+  --md-default-fg-color--lightest: rgba(245, 245, 220, 0.15);
+
+  /* Links */
+  --md-typeset-a-color:         #00d4ff;
+
+  /* Code blocks */
+  --md-code-bg-color:           #0f0f0f;
+  --md-code-fg-color:           #f5f5dc;
+
+  /* Header */
+  --md-header-bg-color:         #050505;
+}
+
+/* ── Header ── */
+.md-header {
+  background-color: #050505;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.15);
+}
+
+/* ── Navigation sidebar ── */
+[data-md-color-scheme="slate"] .md-nav__title {
+  color: #00d4ff;
+}
+
+[data-md-color-scheme="slate"] .md-nav__item--active > .md-nav__link {
+  color: #00d4ff;
+}
+
+/* ── Tabs ── */
+.md-tabs {
+  background-color: #050505;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+}
+
+/* ── Admonitions: use crimson for warning, cyan for note ── */
+[data-md-color-scheme="slate"] .md-typeset .admonition.warning,
+[data-md-color-scheme="slate"] .md-typeset details.warning {
+  border-color: #dc143c;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .admonition.warning > .admonition-title,
+[data-md-color-scheme="slate"] .md-typeset details.warning > summary {
+  background-color: rgba(220, 20, 60, 0.12);
+  color: #dc143c;
+}
+
+/* ── Tables ── */
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
+  background-color: rgba(0, 212, 255, 0.1);
+  color: #00d4ff;
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) tr:hover {
+  background-color: rgba(0, 212, 255, 0.04);
+}
+
+/* ── Code copy button accent ── */
+[data-md-color-scheme="slate"] .md-clipboard:hover {
+  color: #00d4ff;
+}
+
+/* ── Search highlight ── */
+[data-md-color-scheme="slate"] .md-search-result mark {
+  color: #00d4ff;
+}
+
+/* ── Footer ── */
+[data-md-color-scheme="slate"] .md-footer {
+  background-color: #050505;
+  border-top: 1px solid rgba(0, 212, 255, 0.1);
+}
