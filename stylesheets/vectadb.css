@@ -114,7 +114,6 @@
   border-color: #dc143c;
 }
 
-[data-md-color-scheme="slate"] .md-typeset .admonition-title.warning,
 [data-md-color-scheme="slate"] .md-typeset .warning > .admonition-title {
   background-color: rgba(220,20,60,.12);
   color: #dc143c;
@@ -135,4 +134,46 @@
 [data-md-color-scheme="slate"] .md-footer {
   background-color: #050505;
   border-top: 1px solid rgba(0,212,255,.12);
+}
+
+/* ================================================================
+   Orb particles — let them show through the content layers
+   ================================================================ */
+
+/* Particle container sits at z-index:0 (set in JS).
+   Content layers need transparent/semi-transparent backgrounds
+   so the orbs glow through. */
+[data-md-color-scheme="slate"] .md-main {
+  background: transparent;
+}
+
+[data-md-color-scheme="slate"] .md-main__inner {
+  background: transparent;
+}
+
+[data-md-color-scheme="slate"] .md-content {
+  background: transparent;
+}
+
+/* Sidebar keeps a subtle dark bg so text remains readable */
+[data-md-color-scheme="slate"] .md-sidebar {
+  background: rgba(10,10,10,.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Nav sidebar */
+[data-md-color-scheme="slate"] .md-nav {
+  background: transparent;
+}
+
+/* Content article — glassmorphism card so orbs glow around it */
+[data-md-color-scheme="slate"] .md-content__inner {
+  background: rgba(10,10,10,.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0,212,255,.08);
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
 }
