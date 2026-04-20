@@ -1,105 +1,138 @@
-/* VectaDB brand colors — matching vectadb.base44.app */
+/* ================================================================
+   VectaDB brand colors — matching vectadb.base44.app
+   primary: custom tells Material to skip its own palette injection,
+   so we fully own all --md-* variables here.
+   ================================================================ */
 
-/* ── Light mode ── */
-:root {
-  --md-primary-fg-color:        #00a8cc;
-  --md-primary-fg-color--light: #00d4ff;
-  --md-primary-fg-color--dark:  #0080a8;
-  --md-primary-bg-color:        #ffffff;
-  --md-accent-fg-color:         #dc143c;
-  --md-accent-fg-color--light:  #ff1493;
-  --md-typeset-a-color:         #00a8cc;
-}
-
-/* ── Dark mode (slate scheme) ── */
+/* ── Dark mode (default) ── */
 [data-md-color-scheme="slate"] {
-  /* Background layers — near-black like the site */
-  --md-default-bg-color:        #0a0a0a;
-  --md-default-bg-color--light: #0f0f0f;
+  /* Backgrounds — near-black */
+  --md-default-bg-color:          #0a0a0a;
+  --md-default-bg-color--light:   #0f0f0f;
   --md-default-bg-color--lighter: #141414;
-  --md-default-bg-color--lightest: #1a1a1a;
+  --md-default-bg-color--lightest:#1a1a1a;
 
-  /* Primary cyan */
-  --md-primary-fg-color:        #00d4ff;
-  --md-primary-fg-color--light: #00d4ff;
-  --md-primary-fg-color--dark:  #0080a8;
-  --md-primary-bg-color:        #0a0a0a;
+  /* Text — cream/beige */
+  --md-default-fg-color:          #f5f5dc;
+  --md-default-fg-color--light:   rgba(245,245,220,.75);
+  --md-default-fg-color--lighter: rgba(245,245,220,.45);
+  --md-default-fg-color--lightest:rgba(245,245,220,.15);
 
-  /* Accent crimson */
-  --md-accent-fg-color:         #dc143c;
+  /* Primary — cyan */
+  --md-primary-fg-color:          #00d4ff;
+  --md-primary-fg-color--light:   rgba(0,212,255,.70);
+  --md-primary-fg-color--dark:    #0080a8;
+  --md-primary-bg-color:          #050505;
+  --md-primary-bg-color--light:   rgba(5,5,5,.54);
 
-  /* Text — cream/beige like the site */
-  --md-default-fg-color:        #f5f5dc;
-  --md-default-fg-color--light: rgba(245, 245, 220, 0.75);
-  --md-default-fg-color--lighter: rgba(245, 245, 220, 0.45);
-  --md-default-fg-color--lightest: rgba(245, 245, 220, 0.15);
+  /* Accent — crimson */
+  --md-accent-fg-color:           #dc143c;
+  --md-accent-fg-color--transparent: rgba(220,20,60,.10);
+  --md-accent-bg-color:           #fff;
+  --md-accent-bg-color--light:    rgba(255,255,255,.70);
 
   /* Links */
-  --md-typeset-a-color:         #00d4ff;
+  --md-typeset-a-color:           #00d4ff;
 
-  /* Code blocks */
-  --md-code-bg-color:           #0f0f0f;
-  --md-code-fg-color:           #f5f5dc;
+  /* Code */
+  --md-code-bg-color:             #0f0f0f;
+  --md-code-fg-color:             #f5f5dc;
+  --md-code-hl-color:             rgba(0,212,255,.15);
 
-  /* Header */
-  --md-header-bg-color:         #050505;
+  /* Footer */
+  --md-footer-bg-color:           #050505;
+  --md-footer-bg-color--dark:     #020202;
+  --md-footer-fg-color:           rgba(245,245,220,.75);
+  --md-footer-fg-color--light:    rgba(245,245,220,.50);
+  --md-footer-fg-color--lighter:  rgba(245,245,220,.32);
 }
 
-/* ── Header ── */
+/* ── Light mode ── */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color:          #00a8cc;
+  --md-primary-fg-color--light:   rgba(0,168,204,.70);
+  --md-primary-fg-color--dark:    #0080a8;
+  --md-primary-bg-color:          #fff;
+  --md-primary-bg-color--light:   rgba(255,255,255,.70);
+
+  --md-accent-fg-color:           #dc143c;
+  --md-accent-fg-color--transparent: rgba(220,20,60,.10);
+  --md-accent-bg-color:           #fff;
+
+  --md-typeset-a-color:           #00a8cc;
+}
+
+/* ── Header: near-black with cyan underline ── */
 .md-header {
   background-color: #050505;
-  border-bottom: 1px solid rgba(0, 212, 255, 0.15);
+  border-bottom: 1px solid rgba(0,212,255,.2);
+  color: #f5f5dc;
 }
 
-/* ── Navigation sidebar ── */
-[data-md-color-scheme="slate"] .md-nav__title {
-  color: #00d4ff;
-}
-
-[data-md-color-scheme="slate"] .md-nav__item--active > .md-nav__link {
-  color: #00d4ff;
+.md-header__button,
+.md-header__topic {
+  color: #f5f5dc;
 }
 
 /* ── Tabs ── */
 .md-tabs {
   background-color: #050505;
-  border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+  border-bottom: 1px solid rgba(0,212,255,.12);
 }
 
-/* ── Admonitions: use crimson for warning, cyan for note ── */
+.md-tabs__link {
+  color: rgba(245,245,220,.7);
+}
+
+.md-tabs__link--active,
+.md-tabs__link:hover {
+  color: #00d4ff;
+}
+
+/* ── Active nav link ── */
+[data-md-color-scheme="slate"] .md-nav__link--active {
+  color: #00d4ff;
+}
+
+[data-md-color-scheme="slate"] .md-nav__link:hover {
+  color: #00d4ff;
+}
+
+/* ── Table headers ── */
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
+  background-color: rgba(0,212,255,.10);
+  color: #00d4ff;
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) tr:hover {
+  background-color: rgba(0,212,255,.04);
+}
+
+/* ── Admonition warning → crimson ── */
 [data-md-color-scheme="slate"] .md-typeset .admonition.warning,
 [data-md-color-scheme="slate"] .md-typeset details.warning {
   border-color: #dc143c;
 }
 
-[data-md-color-scheme="slate"] .md-typeset .admonition.warning > .admonition-title,
-[data-md-color-scheme="slate"] .md-typeset details.warning > summary {
-  background-color: rgba(220, 20, 60, 0.12);
+[data-md-color-scheme="slate"] .md-typeset .admonition-title.warning,
+[data-md-color-scheme="slate"] .md-typeset .warning > .admonition-title {
+  background-color: rgba(220,20,60,.12);
   color: #dc143c;
-}
-
-/* ── Tables ── */
-[data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
-  background-color: rgba(0, 212, 255, 0.1);
-  color: #00d4ff;
-}
-
-[data-md-color-scheme="slate"] .md-typeset table:not([class]) tr:hover {
-  background-color: rgba(0, 212, 255, 0.04);
-}
-
-/* ── Code copy button accent ── */
-[data-md-color-scheme="slate"] .md-clipboard:hover {
-  color: #00d4ff;
 }
 
 /* ── Search highlight ── */
 [data-md-color-scheme="slate"] .md-search-result mark {
+  color: #00d4ff;
+  background-color: rgba(0,212,255,.15);
+}
+
+/* ── Clipboard copy button ── */
+[data-md-color-scheme="slate"] .md-clipboard:hover {
   color: #00d4ff;
 }
 
 /* ── Footer ── */
 [data-md-color-scheme="slate"] .md-footer {
   background-color: #050505;
-  border-top: 1px solid rgba(0, 212, 255, 0.1);
+  border-top: 1px solid rgba(0,212,255,.12);
 }
