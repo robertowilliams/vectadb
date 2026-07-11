@@ -54,7 +54,7 @@ regex = "1.10"
 
 # Security
 argon2 = "0.5"
-jsonwebtoken = "9"
+jsonwebtoken = "10"
 
 [dev-dependencies]
 # Testing
